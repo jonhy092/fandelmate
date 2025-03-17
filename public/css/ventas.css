@@ -1,0 +1,969 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
+
+
+
+
+
+/*ESTILOS DE REMITO*/
+
+** {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+a {
+	text-decoration: none;
+	cursor: pointer;
+}
+body {
+	font-family: 'Montserrat', sans-serif;
+	background-color: #e2e6da;
+	overflow-x: hidden;
+}
+img {
+	display: block;
+}
+button {
+	outline-style: none;
+	border: none;
+	cursor: pointer;
+}
+fieldset {
+	border: none;
+}
+h1 {
+	font-size: 8em;
+	font-weight: bold;
+	text-shadow: 1px 1px 1px grey;
+}
+h2 {
+	font-size: 1em;
+	
+}
+h3 {
+	font-size: 0.9em;
+	padding: 30px 0px 0px 60px;
+}
+h4 {
+	font-size: 0.8em;
+}
+p {
+	color: #070707;
+	font-size: 1em;
+}
+  .inputtext {
+    border: none;
+    border-bottom: 1.5px dashed #000;
+  }
+  
+  .inputtable {
+    border: none;
+    width: 100%;
+  }
+  
+  .contfac {
+    margin: 5px;
+    width: 22cm;
+    height: 27cm;
+    border: 1px solid #000;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  header {
+    width: 100%;
+  }
+  
+  .headleft {
+    width: 50%;
+    height: 3.5cm;
+    box-sizing: border-box;
+    border: 1px solid #000;
+    border-radius: 10px;
+  }
+  
+  .headleft h3 {
+    width: 99%;
+    border-top: 1px solid #000;
+    padding: 3px;
+    text-align: center;
+    font-size: 10px;
+  }
+  
+  .headcenter {
+    position: absolute;
+    top: 0.5cm;
+  }
+  
+  .headcenter span {
+    font-size: 20px;
+    background-color: #fff;
+    border: 1px solid #000;
+    font-weight: bold;
+    border-radius: 3px;
+    padding: 0px 6px;
+  }
+  
+  .headrigth {
+    width: 50%;
+    height: 3.5cm;
+    box-sizing: border-box;
+    border: 1px solid #000;
+    border-radius: 10px;
+  }
+  
+  .headrigth h1 {
+    font-size: 16px;
+  }
+  
+  .datofecha {
+    position: absolute;
+    top: 1cm;
+    left: 18cm;
+  }
+  
+  .datofecha input {
+    margin-left: 8px;
+  }
+  
+  .datos {
+    width: 100%;
+    box-sizing: border-box;
+    position: absolute;
+    top: 1.9cm;
+    left: 18cm;
+  }
+  
+  .datos p {
+    font-size: 10px;
+  }
+  
+  .datos p strong {
+    font-size: 10px;
+  }
+  
+  .datosinput {
+    width: 100%;
+    border: 1px solid #000;
+    border-radius: 8px;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+  
+  .se input {
+    width: 95%;
+  }
+  
+  .check {
+    width: 100%;
+    border: 1px solid #000;
+    border-radius: 8px;
+    box-sizing: border-box;
+    padding: 5px;
+  }
+  
+  .check .checktop {
+    width: 100%;
+    border-bottom: 1px solid #000;
+    box-sizing: border-box;
+  }
+  
+  .check .checktop .iva {
+    height: 100%;
+    border-right: 1px solid #000;
+    padding: 3px;
+  }
+  
+  .check .boxes {
+    height: 90%;
+    border-right: 1px solid #000;
+    padding: 3px;
+  }
+  
+  .cuitinput {
+    padding: 9px;
+  }
+  
+  .cuitinput input {
+    width: 100%;
+  }
+  
+  .checkbot {
+    width: 100%;
+  }
+  
+  .checkbot h3 {
+    border-right: 1px solid #000;
+    padding: 5px;
+  }
+  
+  .boxcondiciones {
+    width: 26.3%;
+    height: 100%;
+    border-right: 1px solid #000;
+  }
+  
+  .titletable {
+    width: 100%;
+    border: 1px solid #000;
+    border-radius: 8px;
+    box-sizing: border-box;
+    padding: 3px;
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  tr {
+    width: 100%;
+  }
+  
+  td {
+    width: 25%;
+    margin-left: 2%;
+    border: 1px solid #000;
+  }
+  
+  .footer {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .footer .izquierda {
+    box-sizing: border-box;
+    border: 1px solid #000;
+    border-radius: 8px;
+    padding: 4px;
+    width: 75%;
+  }
+  
+  .footer .izquierda .footerizinfo {
+    margin-left: 20px;
+  }
+  
+  .footer .izquierda span {
+    font-size: 15px;
+    font-weight: bold;
+    margin-left: 25px;
+  }
+  
+  .footer .total {
+    width: 25%;
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid #000;
+  }
+  
+  .fx-col {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .fx-col-rev {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  
+  .fx-row {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .fx-row-rev {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  
+  .just-cont-start {
+    justify-content: start;
+  }
+  
+  .just-cont-center {
+    justify-content: center;
+  }
+  
+  .just-cont-end {
+    justify-content: end;
+  }
+  
+  .just-cont-sb {
+    justify-content: space-between;
+  }
+  
+  .just-cont-sa {
+    justify-content: space-around;
+  }
+  
+  .just-cont-se {
+    justify-content: space-evenly;
+  }
+  
+  .aling-items-start {
+    align-items: start;
+  }
+  
+  .aling-items-center {
+    align-items: center;
+  }
+  
+  .aling-items-end {
+    align-items: end;
+  }
+  
+  .fx-wrap {
+    flex-wrap: wrap;
+  }
+  
+  .fx-wrap-rev {
+    flex-wrap: wrap-reverse;
+  }
+  
+  .fx-nowrap {
+    flex-wrap: nowrap;
+  }
+
+  
+  /*ESTILOS DE ADMINISTRADOR PRINCIPAL*/
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
+
+/*------------------------------------------------------------------------------------
+                         DISEÑO GENERAL, FONTS, LAYOUT, COMPONENTES Y TEMAS.
+/*------------------------------------------------------------------------------------/
+
+/*-------------------------------   Inicio GENERALES  -------------------------------*/
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+a {
+	text-decoration: none;
+	cursor: pointer;
+}
+body {
+	font-family: 'Montserrat', sans-serif;
+	background-color: #e2e6da;
+	overflow-x: hidden;
+}
+img {
+	display: block;
+}
+button {
+	outline-style: none;
+	border: none;
+	cursor: pointer;
+}
+fieldset {
+	border: none;
+}
+h1 {
+	font-size: 8em;
+	font-weight: bold;
+	text-shadow: 1px 1px 1px grey;
+}
+h2 {
+	font-size: 1em;
+	
+}
+h3 {
+	font-size: 0.9em;
+	padding: 30px 0px 0px 60px;
+}
+h4 {
+	font-size: 0.8em;
+}
+p {
+	color: #070707;
+	font-size: 1em;
+}
+
+/*--------------  PSEUDOCLASES Y PSEUDOELEMENTOS--------------------*/
+a:link,
+a:visited {
+	color: #070707;
+}
+.product:hover {
+	box-shadow: 0px 0px 25px 0px rgba(0, 0, 0, 0.1);
+	z-index: 1;
+}
+*/*.product-img-container:hover img {
+	transform: scale(1.5);
+	opacity: 0.7;
+}*/
+.btn-cart:hover {
+	background-color: #90d980;
+}
+
+.banner::before {
+	content: '';
+	display: flex;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+}
+/*------------------ DISPLAY ------------------*/
+
+.in-line {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.in-stack {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+.in-grid {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	align-items: center;
+}
+
+/*------------------ THEMES  ------------------*/
+
+.theme-sky {
+	background-color: #cfd3ca;
+	color: rgb(36, 29, 29);
+}
+.theme-sky-dark {
+	background-color:#e1f1d0;
+	color: rgb(11, 10, 10);
+}
+/*------------------.  Fin GENERALES    ------------------*/
+
+/*------------------.   Inicio COMPONENTES   ------------------*/
+
+/*------------------ BOTONES  ------------------*/
+
+.button {
+	font-family: 'Lato', sans-serif;
+	letter-spacing: 3px;
+	font-size: 0.8em;
+	text-transform: uppercase;
+	font-weight: 600;
+	padding: 1em 2em;
+	border-radius: 40px;
+	transition: 0.2s;
+}
+.button-simple-solid {
+	background-color: #153409;
+	color: #dfe2e2;
+	border: none;
+	box-shadow: none;
+}
+.button-simple-solid-reverse {
+	background-color: #dfe2e2;
+	color: #153409;
+	border: none;
+	box-shadow: none;
+}
+.button-simple-empty {
+	background-color: transparent;
+	color: white;
+	border: 1px solid #070707;
+	box-shadow: none;
+}
+
+/*------------------.   Fin COMPONENTES   ------------------*/
+
+/*------------------------------------------
+                                            DISEÑO DESKTOP
+/*------------------------------------------/
+
+/*------------------.   Inicio HEADER CONTACT.HTML   ------------------*/
+
+.header {
+	justify-content:center;
+	padding: 15px 10px 15px 10px;
+	
+}
+
+.branding-logo {
+	width: 25px;
+	height: auto;
+	color: white;
+}
+.branding {
+	margin-left: 10px;
+}
+.btn-cart {
+	color: white;
+	transition: background-color 0.5s;
+}
+.cart-icon {
+	color: #070707;
+	font-size: 2.5em;
+	margin: 0px 5px;
+}
+.cart-qty {
+	margin: 0 5px;
+}
+/*------------------.   Fin HEADER    ------------------*/
+
+/*------------------.   Inicio BANNER    ------------------*/
+.banner {
+	position: relative;
+	width: 100%;           /* Ocupa el 100% del ancho del contenedor */
+	height: 500px;         /* Altura fija de 400px */
+	object-fit: cover;
+}
+
+.banner-title {
+	position: absolute;
+	color: rgb(32, 29, 29);
+	font-weight: bold;
+}
+
+.banner-img{
+  object-fit: cover;
+	width: 100%;
+	height: 500px;
+}
+
+/*------------------.   Fin BANNER   ------------------*/
+
+/*------------------.   Inicio CATALOGO   ------------------*/
+
+/* ---- FILTROS----*/
+
+aside {
+	padding: 15px;
+	
+}
+.filters-container {
+	align-items: flex-start;
+	justify-content: flex-start;
+}
+/*------------------.   Fin BANNER   ------------------*/
+
+/*------------------.   Inicio CATALOGO   ------------------*/
+
+/* ---- FILTROS----*/
+
+aside {
+	padding: 15px;
+	
+}
+.filters-container {
+	align-items: flex-start;
+	justify-content: flex-start;
+}
+.filters-heading-container {
+	justify-content: space-between;
+}
+.filters-title {
+	font-size: 18px;
+}
+.clear-btn {
+	border: none;
+	background: transparent;
+	padding: 10px;
+	align-items: center;
+	color: #218518;
+}
+.clear-title {
+	margin-left: 5px;
+}
+.filters-search-container {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+.input-search-container {
+	margin-top: 10px;
+	justify-content: flex-start;
+}
+.filter-container {
+	margin-top: 10px;
+}
+#input-search {
+	height: 40px;
+	width: 200px;
+	line-height: 40px;
+	padding: 0 20px;
+	border: 0px;
+	border-bottom: 2px solid #43628b;
+	background-color: transparent;
+	position: relative;
+}
+.search-icon {
+	position: absolute;
+	left: 200px;
+}
+.checkboxes-container {
+	margin-top: 20px;
+}
+.input-category-container {
+	margin-top: 15px;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+.input-category {
+	justify-content: flex-start;
+	margin-top: 10px;
+	cursor: pointer;
+}
+.filters-review-container {
+	margin-top: 30px;
+}
+.filter {
+	margin: 0px 10px;
+}
+.filters-review {
+	color: #080817;
+}
+.input-review {
+	justify-content: flex-start;
+	margin: 5px 0px;
+	cursor: pointer;
+}
+.fa-star {
+	font-size: 12px;
+	margin: 0px 2px;
+}
+.fa, .fas {
+	color: #070707;
+    font-weight: 900;
+}
+
+/* ----products ----*/
+
+.products-container {
+	flex: 4;
+}
+.products-header {
+	justify-content: space-between;
+	padding: 30px 15px;
+	margin: 10px;
+	border-radius: 5px;
+}
+
+.products-list {
+	flex-grow: 1;
+	align-items: flex-start;
+}
+#view-button-grid,
+#view-button-list,
+button {
+	margin: 0px 5px;
+	background: transparent;
+	color: white;
+}
+.fa-th,
+.fa-list {
+	font-size: 30px;
+}
+.product {
+	display: flexbox;
+	width: calc(50%/ 2 - 15px * 2);
+	padding: 30px 25px;
+	margin: 10px;
+	background-color: white;
+	border-radius: 5px;
+	overflow: hidden;
+	text-align: center;
+	transition: box-shadow 0.5s;
+}
+.product-img-container {
+	display: flex;
+	height: 250px;
+	overflow: hidden;
+}
+.product-img {
+	height: 100%;
+	margin: auto;
+	transition: 0.2s;
+	opacity: 1;
+}
+.product-content {
+	margin-top: 15px;
+}
+.product-name {
+	font-size: 1.17em;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+.product-price {
+	margin-bottom: 10px;
+}
+.review-product {
+	display: flex;
+}
+.button-add-to-cart {
+	margin: 35px;
+	border: 0;
+}
+.button-add-to-cart:hover{
+	background-color: #1b1818;
+	color: rgb(55, 69, 55);
+	border: 3px solid rgb(55, 69, 55);
+	transform: scale(1.1);
+}
+
+.in-line-product {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	width: 100%;
+}
+.in-line-product .product-img-container {
+	min-width: 250px;
+}
+/*------------------.   Fin CATALOGO   ------------------*/
+
+/*------------------.   Inicio FOOTER   ------------------*/
+.footer-main {
+	padding: 50px 0px;
+	margin-top: 80px;
+}
+.logo {
+	width: 50px;
+	height: auto;
+	margin-right: 10px;
+}
+
+.formasdepago img {
+	/*display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-gap: 5px;*/
+	height: 25px;
+	width: 40px;
+}
+/*------------------.   Fin FOOTER   ------------------*/
+
+
+
+/*------------------.   Inicio MENU CARRITO ------------------*/
+
+.header-menu-add-to-card {
+	height: 100%;
+	width: 600px;
+	position: fixed;
+	right: 0;
+	top: 0px;
+	padding: 40px 25px;
+	transition: 1s;
+	z-index: 3;
+}
+.cart-full {
+	align-items: flex-start;
+	width: 100%;
+}
+.cart-title-container {
+	width: 100%;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+.btn-close {
+	color: white;
+	font-size: 20px;
+}
+.cart-products-added {
+	flex-grow: 1;
+	max-height: 300px;
+	max-height: 550px;
+    overflow-y: scroll;
+}
+
+.cart-product-added {
+	padding: 10px 0;
+	display: flex;
+	border-bottom: 1px solid #dedede;
+}
+.subtotal-container {
+	margin-top: 30px;
+}
+.cart-product-img {
+	max-width: 80px;
+	width: 100%;
+	height: auto;
+	margin-right: 25px;
+}
+.cart-product-details {
+	flex-grow: 1;
+	padding: 5px 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+.cart-product-info {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+.cart-product-price-qty {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.cart-product-qty {
+	width: 50px;
+	height: 30px;
+	font-weight: 600;
+	text-align: center;
+}
+.cart-product-price {
+	margin-left: 20px;
+}
+.add-to-card-buttons {
+	display: flex;
+	margin-top: 25px;
+	width: 100%;
+	bottom: 5%;
+	flex-direction: row;
+	justify-content: center;
+}
+.menu-add-to-card-hidde {
+	transform: translateX(500px);
+}
+.cart-empty-msg {
+	margin-top: 30%;
+	max-width: 300px;
+}
+.btn-buy {
+	color: #070707;
+	margin: 15px 5px;
+}
+/*------------------.   Fin MENU CARRITO ------------------*/
+
+/*------------------.   Inicio MODAL VACIAR ------------------*/
+
+.modal-empty-cart {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+	max-height: 350px;
+	background-color: #181717;
+	padding: 40px 30px;
+	max-width: 500px;
+	z-index: 5;
+}
+.modal-message {
+	text-align: center;
+	font-size: 30px;
+	font-weight: 700;
+}
+.modal-btn-container {
+	margin-top: 30px;
+	display: flex;
+	justify-content: flex-end;
+}
+
+/*------------------.   Fin MODAL VACIAR ------------------*/
+
+
+/*  ESTILOS DE LA LISTA COLECCION*/
+.menu li {
+    position: relative;
+    display: inline-block;
+}
+
+.menu li .dropdown {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.menu li:hover .dropdown {
+    display: block;
+}
+
+.dropdown li {
+    display: block;
+    padding: 8px;
+}
+
+.dropdown li a {
+    text-decoration: none;
+    color: #000;
+    display: block;
+}
+
+.dropdown li a:hover {
+    background-color: #f1f1f1;
+}
+.menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1;
+    background-color: rgb(223, 240, 254);
+}
+
+.menu li a {
+    color: rgb(24, 13, 13);
+    text-decoration: none;
+    padding: 12px 20px;
+    font-size: 1em;
+    transition: color 0.3s, border-bottom 0.3s;
+}
+
+.menu li a:hover,
+.menu li a.active {
+    color: #1d2316;
+    border-bottom: 2px solid #38675f;
+}
+
+/*ESTILOS DE BIENVENIDA*/
+.container-stock{
+display: flex;
+justify-content: center;
+align-items: center;
+height: 120px;
+background-color: #aeb6ac;
+}
+.text-center{
+font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+color: #181717;
+font-size: 2em;
+text-align: center;
+}
+/*ESTILOS DE REMITO*/
+ button {
+	
+    margin: 10px 5px 0px 0px;
+    background: transparent;
+    color: #000;
+
+	border-bottom: #1f1f7c 2px solid;
+ }
+ /*ESTILOS DE FACTURAS*/
+ h1 {
+    text-align: center;
+    color: #333;
+}
+form {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: auto;
+}
+label {
+    display: block;
+    margin: 10px 0;
+}
+button {
+    background: #28a745;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    background: #218838;
+}

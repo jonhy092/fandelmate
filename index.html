@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>FAN DEL MATE</title>
+    <link rel="shortcut icon" href="public/images/logo2.png">
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="public/css/main.css">
+    <link rel='stylesheet' type='text/css' media='screen' href='public/css/all.min.css'>
+</head>
+
+<body>
+<nav>  
+    <!-- ------------------- INICIO BANNER- ------------------------- -->
+
+
+    <!----------------------------- FIN BANNER -------------------------------------- -->
+   
+    <header class="header theme-sky-dark in-line" id="header">
+
+        <!-- inicia marca del header -->
+
+        <div class="in-line">
+            <img class="branding-logo"
+                 src="public/images/logo2.png"
+                 alt ="logotipo de FAN DEL MATE"
+                 aria-hidden="true" />
+            <p class="branding"
+               aria-label="Bienvenido a nuestra tienda on-line:">FAN DEL MATE</p>
+        </div>
+
+        <!-- finaliza marca del header-->
+         <!-- LISTA DE COLECCION-->
+         <div class="in-line">
+            <p class="branding" aria-label="Bienvenido a nuestra tienda on-line:"></p>
+            <ul class="menu">
+                <li>
+                    <a href="index.html">Nuestros Productos</a>
+                    <ul class="dropdown">
+                        <li><a href="#" class="filter-category" data-category="1">Mates</a></li>
+                        <li><a href="#" class="filter-category" data-category="2">Yerbas</a></li>
+                        <li><a href="#" class="filter-category" data-category="3">Bombillas</a></li>
+                        <li><a href="#" class="filter-category" data-category="4">Termos</a></li>
+                        <li><a href="#" class="filter-category" data-category="5">Accesorios</a></li>
+                    </ul>
+                </li>
+               
+                <li><a href="contact.html">Contacto</a></li>
+            </ul>
+        </div>
+        
+        
+
+
+
+
+        <!-- inicia boton cart-->
+
+        <div>
+            <button type="button"
+                    class=" btn-cart in-line button button-simple-empty"
+                    aria-label="Mostrar productos agregados al carrito">
+                <i class="fas fa-shopping-cart cart-icon"
+                   aria-hidden="true"
+                   aria-live="polite"></i>
+                <div class= "cart-text">
+                    <p>Carrito (<span class="cart-qty">0</span>ítems)</p>
+                </div>
+                
+            </button>
+        </div>
+        <!--finaliza boton cart-->
+        
+          
+    </header>
+</nav>
+
+    <!---------------------- FIN HEADER ----------------------- -->
+
+    <!--------------------------- INICIO CATALOGO  ------------------------------------->
+
+    <main id="shop">
+
+        
+    <section class="banner  in-stack">
+        <img class="banner-img" src="public/images/mate.jpg" alt= "escritorio con productos de la categoria mates." aria-hidden="true" />
+        <div class="banner-title">
+           <h1 >FAN DEL MATE</h1>
+           
+        </div>
+       
+        
+    </section>
+        <!--Inicio Filtros -->
+
+         <!-- <section class="filters-container in-line"
+                 aria-labelledby="filters-title">
+                    
+            <aside class= "filters-aside">
+                <button
+                type="button"
+                class="close-filters-btn is-hidden"
+                aria-label="Cerrar filtros">
+                <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                
+                inicia Header Filtro
+                <div class="filters-heading-container in-line">
+                    <div class="filters-title">
+                        <h2 aria-label= "Agilice la búsqueda del producto utilizando:">
+                            FILTROS</h2>
+                    </div>
+
+                    <div class="filters-clear-btn-container">
+                        <button type="button" class="clear-btn in-line"
+                                aria-label="¿Desea quitar los filtros seleccionados?">
+                            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                            <h3 class="clear-title">
+                                Limpiar
+                            </h3>
+                        </button>
+                    </div>
+
+                </div> -->
+                 <!--fin Header Filtro -->
+
+                <!-- Inicia Busqueda -->
+               <!-- <form>
+                    <div class="filters-search-container">
+                        <div>
+                            <h3>BUSCAR</h3>
+                        </div>
+                        <label for="input-search" 
+                            class="input-search-container in-line">
+                            <input type="text"
+                                id="input-search"
+                                placeholder="¿Qué está buscando?"
+                                aria-label="Escriba el nombre del producto que busca">
+                            </input>
+                            <i class="fas fa-search search-icon"
+                            aria-hidden="true">
+                            </i>
+                        </label>
+                    </div>  -->
+                <!-- fin Busqueda -->
+
+                <!-- Inicio Filtro category -->
+                     <!-- <fieldset class="filters-category-container ">
+                        <legend>
+                            <h3 aria-label="Filtre los productos 
+                                por la categoria a la que pertenecen">
+                                Filtrar por...
+                            </h3>
+                        </legend>
+
+                        <div class="checkboxes-container input-category-container">
+                            <label for= "consolas" class="input-category in-line"> -->
+                              <!--   <input type="checkbox"
+                                    class=" filter filter-category"
+                                    name="category"
+                                    value="mates"
+                                    id= "mates">
+                                </input> -->
+                               <!-- <h4>MATES</h4>
+                            </label> 
+
+                            <label for= "notebooks" class="input-category in-line">
+                                <input type="checkbox"
+                                    class="filter filter-category"
+                                    name="category" 
+                                    value="yerbas"
+                                    id= "yerbas">
+                                </input>
+                                <h4>YERBAS</h4>
+                            </label>
+
+                            <label for= "termos" class="input-category in-line">
+                                <input type="checkbox"
+                                    class="filter filter-category"
+                                    name="category"
+                                    value="termos"
+                                    id= "termos">
+                                </input>
+                                <h4>TERMOS</h4>
+                            </label>
+
+                            <label for ="bombillas" class="input-category in-line">
+                                <input type="checkbox"
+                                    class="filter filter-category"
+                                    name="category"
+                                    value="bombillas"
+                                    id= "bombillas">
+                                </input>
+                                <h4>BOMBILLAS</h4>
+                            </label>
+
+                            <label for= "accesorios" class="input-category in-line">
+                                <input type="checkbox"
+                                    class="filter filter-category"
+                                    name="category"
+                                    value="accesorios"
+                                    id= "accesorios">
+                                </input>
+                                <h4>ACCESORIOS</h4>
+                            </label>                  -->
+                        <!-- </fieldset> -->
+                <!-- fin Filtro categoria -->
+
+                <!-- Inicio Filtro review -->
+
+                    <!--BORRADO DEL PUNTAJE-->
+                        <!-- Fin Filtro review -->
+                    </div>
+            </aside>
+            <!--Fin Filtros -->
+
+            <!-- Inicio Catalogo de Productos  -->
+
+            <section class="products-container ">
+
+                <!--  Inicia header de productos  -->
+                <header class="products-header in-line theme-sky">
+                    <div>
+                        <p id="products-qty"
+                           aria-live="polite">NUESTROS PRODUCTOS...</p>
+                    </div>
+                    <div class="view-buttons-container in-line ">
+                        <div>
+                            <p aria-label="Modificar la vista de la lista de productos">
+                                Ver descripciones</p>
+                        </div>
+                        <div id="view-button-grid">
+                            <button type="button">
+                                <i class="fas fa-th"
+                                   aria-hidden="true"
+                                   title="Mosaico"></i>
+                            </button>
+                        </div>
+                        <div id="view-button-list">
+                            <button type="button">
+                                <i class="fas fa-list" 
+                                   aria-hidden="true"
+                                   title="Lista"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button
+                    type="button"
+                    class="open-filters-btn button button-simple-empty is-hidden"
+                    aria-label="Abrir filtros">
+                    <i class="fas fa-filter" aria-hidden="true"></i>
+                    <span class= "filter-text">Filtros</span>
+                   </button>
+                </header>
+                <!--  fin header de productos  -->
+
+                <!--*****  PRODUCTOS *****  -->
+
+                <div class="products-list in-grid">
+
+
+                    <!--  fin listado Productos  -->
+            </section>
+
+    </main>
+
+    <!----------------------------------------------- FIN CATALOGO -------------------- -->
+
+
+
+    <!--  -------------------------･ INICIO FOOTER ----------------- -->
+      
+         <!-- INICIA BOTON INICIO DE SESION-->
+         <div>
+            <button type="button"
+                    class="btn-login in-line button button-simple-empty"
+                    aria-label="Redirigir al inicio de sesión"
+                    onclick="redirectToLogin()">
+              <i class="fas fa-sign-in-alt login-icon" aria-hidden="true"></i>
+              <div class="login-text">
+                <a href="usuario.html" >Administrador</a>
+              </div>
+            </button>
+          </div>
+          <!-- FIN DEL BOTON INICIO SESION-->
+    <footer class="footer-main in-grid theme-sky-dark">
+        <div class="logo-container in-line">
+            <img src="public/images/logo2.png" 
+                 alt ="logotipo de FAN DEL MATE"
+                 class="logo" />
+                 <p>FAN DEL MATE @2023</p>  <br>
+        </div>
+        <div class="formasdepago in-line">
+            <h3> TODOS LOS MEDIOS DE PAGO</h3> <br>
+            <img src="public/images/mediosdepago/american-express.png" alt="american-express">
+            <img src="public/images/mediosdepago/argencard.png" alt="argencard">
+            <img src="public/images/mediosdepago/cabal.png" alt="cabal">
+            <img src="public/images/mediosdepago/diners-club.png" alt="diners-club">
+            <img src="public/images/mediosdepago/efectivo.png" alt="efectivo">
+            <img src="public/images/mediosdepago/maestro.png" alt="maestro">
+            <img src="public/images/mediosdepago/mastercard.png" alt="mastercard">
+            <img src="public/images/mediosdepago/mercadopago.png" alt="mercadopago">
+            <img src="public/images/mediosdepago/naranja.png" alt="naranja">
+            <img src="public/images/mediosdepago/nativa.png" alt="nativa">
+            <img src="public//images/mediosdepago/pagofacil.png" alt="pagofacil">
+            <img src="public/images/mediosdepago/rapipago.png" alt="rapipago">
+            <img src="public/images/mediosdepago/visa.png" alt="visa">
+        </div>
+        <div class="Contactos">
+            <h3> CONTACTO </h3> <br>
+            <p> fandelmate@gmail.com </p> <br>
+            <p> Av. Estrugamou 250, Venado Tuerto, Santa Fe, Argentina.</p>
+         </div>
+    </footer>
+    <!-------------------------------- FIN FOOTER---------------------- -->
+
+    <!-- ------------------------- INICIO MENU CARRITO ------------------------´ -->
+
+    <div class="header-menu-add-to-card theme-sky-dark menu-add-to-card-hidde is-hidden ">
+        <div class="cart-container in-stack">
+            <div class="cart-title-container in-line">
+                <h2>CARRITO</h2>
+                <button type="button" class="btn-close">
+                    <i class="far fa-window-close"></i>
+                </button>
+            </div>
+            <div class= "cart-full"> 
+                
+                <div class="in-line">
+                <p><span class="cart-qty">0</span> producto(s) agregado(s)</p>
+                </div>
+                
+                <div class="cart-products-added">
+                </div>
+            
+                <div class=" add-to-card-buttons">
+                
+                    <button type="button" class="btn-buy button
+                button-simple-solid-reverse">
+                    COMPRAR
+                    </button>
+                
+                    <button type="button" class="btn-empty-cart btn-buy button
+                button-simple-empty ">
+                    VACIAR
+                    </button>   
+                </div>     
+                
+                <div class="subtotal-container in-line">
+                <p> Subtotal $ <span class="cart-subtotal-value">0</span></p>
+                </div>
+        </div>
+        <!--  MENSAJE DE CARRITO VACÍO -->
+            <div class="cart-empty is-hidden">
+                <p class="cart-empty-msg ">
+                    No tienes productos en el carrito, ¡Agrega algunos!
+                </p>
+            </div>      
+        </div>
+    </div>
+    <!-------------------------------  FIN MENU CARRITO-------------------------------- -->
+
+    <!------------------------------  INICIO CONFIRMACION DE COMPRA--------------------- -->
+    <div class="menu-checkout in-stack is-hidden">
+        <h2 class="checkout-title">Checkout</h2>
+        <div class= "checkout-container in-line">
+            <div class= "form-container">
+                <form>
+                    <fieldset class="checkout-info in-stack">             
+                        <div class="checkout-personal-info">
+                            <legend class="info-title">Datos Personales</legend>
+                            <div class="checkout-personal-info-inputs ">
+                                <label for= "nameAndSurname">
+                                    Nombre y apellido *
+                                    <input type="text" 
+                                        placeholder="p. ej.: fandelmate@gmail.com" 
+                                        name="Nombre y Apellido" required 
+                                        id="nameAndSurname" />
+                                </label>
+                                <label for="email">
+                                    Email *
+                                    <input type="email" 
+                                        placeholder="p. ej.: fandelmate@gmail.com" required
+                                        id="email" />
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <!-- *** [ Comiezo Opciones de Pago ] *** -->
+                    <fieldset class="checkout-payment in-stack">
+                        <div class="checkout-section-container in-stack">
+                            <legend class="info-title">Opciones de pago</legend>
+                            <label for="cash-debit">
+                                <input type="radio" 
+                                       class= "pay-option"
+                                       name="payment" 
+                                       value="cash-debit" 
+                                       checked 
+                                       id="cash-debit"/>
+                                       Efectivo / Débito
+                                </input>
+                            </label>
+                            <label for="credit">
+                                <input type="radio" 
+                                       class= "pay-option"
+                                       name="payment" 
+                                       value="credit" 
+                                       id="credit"/>
+                                       Tarjeta de crédito
+                                </input>
+                            </label>
+                            <label for="delivery">
+                                <input type="checkbox" 
+                                       class= "pay-option"
+                                       name="delivery" 
+                                       id="delivery"/> 
+                                       Necesito envío
+                            </label>
+                            <label for="discount">
+                                <input type="checkbox" 
+                                       class= "pay-option"
+                                       name="discount" 
+                                       id="discount"/> 
+                                       Tengo tarjeta de descuento
+                            </label>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <!-- *** [ Fin Opciones de Pago ] *** -->
+
+            <!-- *** [ Comienzo Subtotales ] *** -->
+            <div class="cart-totals in-stack">
+                <h3 class="info-title">Resumen</h3>
+                <div>
+                    <p class="cart-subtotal">
+                        Subtotal $ <span class="cart-subtotal-value">0</span>
+                    </p>
+                    <p class="cart-tax is-hidden">
+                        Recargo $<span class="cart-tax-value">0</span>
+                    </p>
+                    <p class="cart-discount is-hidden">
+                        Descuento 10% $<span class="cart-discount-value">0</span>
+                    </p>
+                    <p class="cart-delivery is-hidden">
+                        Envío $<span class="cart-delivery-value">0</span>
+                    </p>
+                    <p class="cart-total">
+                        Total: $ <span class="cart-total-value">0</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- *** [ Fin Subtotales ] *** -->
+
+        <footer class="footer-checkout in-line">
+            <button type="button" class="btn-cancel-buy button button-simple-solid">
+                Seguir comprando
+            </button>
+            <button type="button" class="btn-finish-buy button button-simple-solid-reverse">
+                Finalizar
+            </button>
+        </footer>
+    </div>
+
+    <!-- ---------------------- FIN CONFIRMACION DE COMPRA --------------- -->
+
+    <!--  --------------------  INICIO MODAL VACIAR CARRITO -------------------- -->
+    
+    <div class="modal-empty-cart in-stack is-hidden"  
+         aria-role="dialog"
+         aria-modal="true"
+         aria-describedby="empty-cart-description"
+         aria-hidden="true">
+
+        <p class="modal-message" id="empty-cart-description">
+            Estás por vaciar el carrito, ¿quieres continuar?
+        </p>
+        <footer class="modal-btn-container">
+            <button type="button" class="button button-simple-solid-reverse cancel-empty-cart-btn">
+                Cancelar
+            </button>
+            <button type="button" class="button button-simple-solid confirm-cart-empty-btn">
+                Vaciar
+            </button>
+        </footer>
+    </div>
+    <div class="overlay is-hidden" id="overlay"></div>
+        <!-- ------------- FIN MODAL VACIAR CARRITO ------------------ -->
+        
+          
+        
+        <script src="public/js/index.js"  defer></script>
+</body>
+
+</html>

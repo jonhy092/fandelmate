@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="public/css/style.css">
+  <title>Registro de Usuario</title>
+</head>
+<body>
+  <h2>Registro de Usuario</h2>
+  <form id="registerForm">
+    <input type="text" id="newUsername" placeholder="Usuario" required>
+    <input type="password" id="newPassword" placeholder="Contraseña" required>
+    <button type="submit">Registrar</button>
+  </form>
+
+  <h2>Edita los usuarios que desees.</h2>
+  <form id="editUserForm" style="display: none;">
+    <input type="hidden" id="editUserId">
+    <input type="text" id="editUsername" placeholder="Nuevo Usuario" required>
+    <input type="password" id="editPassword" placeholder="Nueva Contraseña">
+    <button type="submit">Guardar Cambios</button>
+    
+  </form>
+  <h3>Lista de Usuarios</h3>
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="/server/register.js" defer></script>
+</body>
+</html>

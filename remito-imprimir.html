@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="public/css/ventas.css" />
+   
+    <title>Remito</title>
+</head>
+<body class="fx-row just-cont-center">
+    <!-- Formulario para enviar los datos del remito -->
+    <form id="miFormulario" class="contfac fx-col just-cont-start aling-items-center">
+        <header class="fx-row just-cont-sa">
+            <div class="headleft fx-col just-cont-end aling-items-center">
+                <h3>IVA RESPONSABLE INSCRIPTO</h3>
+            </div>
+            <div class="headcenter">
+                <span class="c">R</span>
+            </div>
+            <div class="headrigth fx-col aling-items-center">
+                <h1>REMITO</h1>
+                <div class="datofecha fx-row aling-items-center">
+                    <h4 class="fecha">FECHA</h4>
+                    <input type="date" id="fecha" name="fecha" required />
+                </div>
+
+                <div class="datos fx-col">
+                    <p class="cuit">
+                        <strong>C.U.I.T. N1:</strong>
+                        <input type="number" id="cuit" name="cuit" required />
+                    </p>
+                    <p class="brutos">
+                        <strong>Ingresos Brutos:</strong>
+                        <input type="number" id="ingresosBrutos" name="ingresosBrutos" required />
+                    </p>
+                    <p class="acti">
+                        <strong>Inicio de Actividades:</strong>
+                        <input type="number" id="inicioActividades" name="inicioActividades" required />
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <div class="datosinput fx-col">
+            <div class="se fx-row">
+                <p>Senor/es:</p>
+                <input class="inputtext" type="text" id="nombre" name="nombre" required />
+            </div>
+            <div class="se fx-row">
+                <p>Direccion:</p>
+                <input class="inputtext" type="text" id="domicilio" name="domicilio" required />
+                <p>Loc:</p>
+                <input class="inputtext" type="text" id="localidad" name="localidad" required />
+            </div>
+        </div>
+
+        <div class="check fx-col">
+            <div class="checktop fx-row aling-items-center">
+                <div class="iva fx-row aling-items-center">
+                    <h2>IVA</h2>
+                </div>
+                <div class="boxes fx-col just-cont-center">
+                    <div class="boxtop fx-row">
+                        <div class="fx-row">
+                            <p>Responsable Inscripto</p>
+                            <input type="checkbox" id="ivaResponsable" name="ivaResponsable" />
+                        </div>
+                    </div>
+                </div>
+                <div class="cuitinput fx-row">
+                    <p><strong>C.U.I.T. N: </strong></p>
+                    <p><input class="inputtext" type="number" id="cuitResponsable" name="cuitResponsable" /></p>
+                </div>
+            </div>
+            <div class="checkbot fx-row just-cont-start aling-items-center">
+                <h3>Condiciones de Venta:</h3>
+                <div class="boxcondiciones fx-row aling-items-center just-cont-se">
+                    <div class="boxescondicones fx-row">
+                        <p>Contado</p>
+                        <input type="checkbox" id="contado" name="condiciones" value="Contado" />
+                    </div>
+                    <div class="boxescondicones fx-row">
+                        <p>Cta. Cte.</p>
+                        <input type="checkbox" id="ctaCte" name="condiciones" value="Cta. Cte." />
+                    </div>
+                </div>
+                <div class="cuitinput fx-row">
+                    <p><strong>FACTURA N°: </strong></p>
+                    <p><input class="inputtext" type="number" id="facturaNumero" name="facturaNumero" /></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="titletable fx-row just-cont-sa">
+            <h3>CANTIDAD</h3>
+            <h3>DESCRIPCION</h3>
+        </div>
+        <table>
+            <!-- Aquí puedes agregar más filas según sea necesario -->
+            <tr>
+                <td><input class="inputtable" type="number" id="cantidad1" name="cantidad[]" /></td>
+                <td><input class="inputtable" type="text" id="descripcion1" name="descripcion[]" /></td>
+            </tr>
+            <tr>
+                <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+                <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+            </tr>
+            <tr>
+              <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+              <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+          </tr>
+          <tr>
+            <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+            <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+        </tr>
+        <tr>
+          <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+          <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+      </tr>
+      <tr>
+        <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+        <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+    </tr>
+    <tr>
+      <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+      <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+  </tr>
+  <tr>
+    <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+    <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+</tr>
+<tr>
+  <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+  <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+</tr>
+<tr>
+  <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+  <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+</tr>
+<tr>
+  <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+  <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+</tr>
+<tr>
+  <td><input class="inputtable" type="number" id="cantidad2" name="cantidad[]" /></td>
+  <td><input class="inputtable" type="text" id="descripcion2" name="descripcion[]" /></td>
+</tr>
+        </table>
+
+        <div class="footer fx-row">
+            <div class="izquierda fx-col aling-items-start">
+                <div class="footerizinfo">
+                    <p>
+                        ORIGINAL BLANCO - DUPLICADO COLOR
+                        <br />
+                        <strong>"DOCUMENTO NO VÁLIDO COMO FACTURA"</strong>
+                        <span>TOTAL $</span>
+                    </p>
+                </div>
+            </div>
+            <div class="total"></div>
+        </div>
+
+        <!-- Botón para enviar el formulario -->
+        <button type="submit">Guardar Remito</button>
+        <button id="descargarRemito">Descargar Remito en PDF</button>
+    </form>
+   
+    <script src="server/documentos.js"defer></script>
+    
+</body>
+</html>

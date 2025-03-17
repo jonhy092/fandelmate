@@ -1,0 +1,144 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+   
+}
+
+body {
+   
+    font-family: Arial, sans-serif;
+    background-color: #eaecec;
+  }
+ 
+  .map{
+    display: grid;
+   
+    flex-wrap: wrap;
+   
+
+  }
+  .mapa{
+   display: grid;
+   width: 50%;
+   height: 300px; 
+   padding-left: 5%;
+   
+  }
+  .parr{
+   display: grid;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   text-align: justify;
+   flex-wrap: wrap;
+   padding:35px;
+   font-size: 22px;
+   font-family:Verdana, Geneva, Tahoma, sans-serif;
+   color: #333;
+  
+}
+.img{
+   display: grid;
+  
+   object-fit: cover;
+   border-radius: 5px;
+   padding-left: 5%;
+}
+.img-contact{
+   display: grid;
+   width: 450px;
+   height: 450px;
+   padding-left: 0.5%;
+}
+/* ESTILOS DE PARRAFOS DEL ASIDE CONTACT*/
+.aside-contact {
+   text-align:left; /* Centrar todo el contenido */
+   max-width: 100%; /* Ancho máximo para mejor legibilidad */
+   margin: 0 auto; /* Centrar el contenedor */
+   padding: 20px;
+   font-family: Arial, sans-serif;
+}
+
+
+.aside-contact h3 {
+   font-size: 24px;
+   margin-bottom: 10px;
+   color: #333;
+}
+.aside-contact p {
+   font-size: 22px;
+   color: #666;
+   margin-bottom: 20px; /* Espacio entre el texto y el botón */
+}
+/*  FIN DE ESTILOS DE PARRAFOS DEL ASIDE CONTACT*/
+  .container{
+    display: flex;
+    flex-direction: column;
+    margin: 30px 20px 30px 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    
+    
+  }
+  .container h2{
+    font-size: 24px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    margin-bottom: 20px;
+    
+    color: #333;
+  }
+ 
+
+ 
+
+
+ .input{
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 18px;
+ }
+ .btn{
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+ }
+ .input-sub{
+    width: 50%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #1c1b1b;
+    border-radius: 5px;
+    height: 50px;
+    font-size: 18px;
+ }
+ .input-sub:hover{
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+ }
+ /* ESTILOS DEL BOTON DE CONTACTO WSP*/
+ .btn-contact {
+   display: inline-flex;
+   align-items:end;
+   gap: 10px; /* Espacio entre el ícono y el texto */
+   padding: 12px 24px;
+   font-size: 16px;
+   color: #fff;
+   background-color: #25D366; /* Color verde de WhatsApp */
+   border: none;
+   border-radius: 5px;
+   cursor: pointer;
+   transition: background-color 0.3s ease; /* Transición suave */
+}
+.btn-contact:hover {
+   background-color: #128C7E; /* Color verde oscuro al pasar el mouse */
+}
