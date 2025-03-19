@@ -73,21 +73,76 @@
             height: calc(3.5rem + 2px);
         }
         
-        /* Estilo de tablas */
-        .table {
-            background-color: white;
-            font-size: 1.1rem;
-        }
-        
-        /* Estilo de formularios */
-        .form-control {
-            font-size: 1.1rem;
-            padding: 0.5rem 1rem;
-        }
-        
-        .btn {
-            font-size: 1.1rem;
-        }
+        table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr {
+    transition: background-color 0.3s ease-in-out;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+td {
+    color: #333;
+    font-size: 16px;
+}
+
+th {
+    font-size: 18px;
+}
+
+td:last-child {
+    text-align: center;
+}
+
+button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
     </style>
 
 </head>
@@ -124,6 +179,21 @@
             📦 Ver Productos
         </button>
     </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Categoría</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="products-table-body"></tbody> <!-- ESTE ID DEBE ESTAR -->
+    </table>
+    
     
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
