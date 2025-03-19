@@ -80,6 +80,99 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     };
+// FROTEND DE PRODUCTOS.HTML CARGA DE PRODUCTOS DESDE POSTGRESQL/
+document.addEventListener("DOMContentLoaded", () => {
+    const btnVerProductos = document.getElementById("btnVerProductos");
+    const productsTableBody = document.getElementById("products-table-body");
+
+    // Obtener productos de la base de datos
+    btnVerProductos.addEventListener("click", async () => {
+        try {
+            const response = await fetch("/products");
+            if (!response.ok) throw new Error("Error al obtener productos");
+
+            const products = await response.json();
+            renderProducts(products);
+        } catch (error) {
+            console.error(error);
+            alert("Error al obtener productos");
+        }
+    });
+
+    // Función para mostrar productos en la tabla
+    function renderProducts(products) {
+        productsTableBody.innerHTML = "";
+        products.forEach(product => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${product.id}</td>
+                <td>${product.name}</td>
+                <td>${product.description}</td>
+                <td>${product.quantity}</td>
+                <td>$${product.price.toFixed(2)}</td>
+                <td>${product.category}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm update-btn" data-id="${product.id}">✏️ Editar Stock</button>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="${product.id}">🗑 Eliminar</button>
+                </td>
+            `;
+            productsTableBody.appendChild(row);
+        });
+
+        // Agregar eventos a los botones después de renderizar la tabla
+        document.querySelectorAll(".update-btn").forEach(button => {
+            button.addEventListener("click", updateStock);
+        });
+
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", deleteProduct);
+        });
+    }
+
+    // Actualizar stock de un producto
+    async function updateStock(event) {
+        const productId = event.target.dataset.id;
+        const newQuantity = prompt("Ingrese la nueva cantidad:");
+
+        if (!newQuantity || isNaN(newQuantity) || newQuantity < 0) {
+            alert("Cantidad inválida.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/products/${productId}/reduce-stock`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ quantity: parseInt(newQuantity) })
+            });
+
+            if (!response.ok) throw new Error("Error al actualizar stock");
+
+            alert("Stock actualizado.");
+            btnVerProductos.click(); // Refrescar productos
+        } catch (error) {
+            console.error(error);
+            alert("Error al actualizar stock.");
+        }
+    }
+
+    // Eliminar un producto
+    async function deleteProduct(event) {
+        const productId = event.target.dataset.id;
+        if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+
+        try {
+            const response = await fetch(`/products/${productId}`, { method: "DELETE" });
+            if (!response.ok) throw new Error("Error al eliminar producto");
+
+            alert("Producto eliminado.");
+            btnVerProductos.click(); // Refrescar productos
+        } catch (error) {
+            console.error(error);
+            alert("Error al eliminar producto.");
+        }
+    }
+});
 
     // Cargar productos al iniciar
     loadProducts();
