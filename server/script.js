@@ -57,34 +57,40 @@ document.addEventListener("DOMContentLoaded", () => {
             button.addEventListener("click", deleteProduct);
         });
     }
+//ACTUALIZAR STOCK DE PRODUCTOS//
+async function updateStock(event) {
+    const productId = event.target.dataset.id;
+    let newQuantity = prompt("Ingrese la nueva cantidad:"); // Cambiar de const a let
 
-    async function updateStock(event) {
-        const productId = event.target.dataset.id;
-        const newQuantity = prompt("Ingrese la nueva cantidad:");
-
-        if (!newQuantity || isNaN(newQuantity) || newQuantity < 0) {
-            alert("Cantidad inválida.");
-            return;
-        }
-
-        try {
-            const response = await fetch(`http://localhost:3001/products/${productId}/reduce-stock`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ quantity: parseInt(newQuantity) })
-            });
-
-            if (!response.ok) {
-                throw new Error("Error al actualizar stock");
-            }
-
-            alert("Stock actualizado.");
-            loadProducts();
-        } catch (error) {
-            console.error(error);
-            alert("Error al actualizar stock.");
-        }
+    if (!newQuantity || isNaN(newQuantity) || newQuantity < 0) {
+        alert("Cantidad inválida.");
+        return;
     }
+
+    newQuantity = Number(newQuantity); // Ahora podemos reasignar sin error
+    console.log("Enviando datos al backend:", { productId, newQuantity }); // <-- LOG PARA DEPURAR
+
+    try {
+        const response = await fetch(`http://localhost:3001/products/${productId}/reduce-stock`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ quantity: newQuantity }) // Enviar como número
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Error al actualizar stock");
+        }
+
+        alert("Stock actualizado.");
+        loadProducts();
+    } catch (error) {
+        console.error(error);
+        alert("Error al actualizar stock.");
+    }
+}
+
 
     async function deleteProduct(event) {
         const productId = event.target.dataset.id;
