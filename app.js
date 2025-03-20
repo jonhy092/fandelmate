@@ -156,13 +156,24 @@ app.post('/products', upload.single('image'), async (req, res) => {
 // Get products//
 app.get('/products', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM products ORDER BY id');
+    const result = await pool.query(`
+      SELECT p.id, p.name, p.description, p.price, p.quantity, p.image_url, 
+             p.category_id, c.name AS category_name 
+      FROM products p
+      JOIN categories c ON p.category_id = c.id
+      ORDER BY p.id
+    `);
+    
+    console.log("Productos obtenidos del backend:", result.rows); // Verifica la respuesta en la terminal
+    
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error al obtener productos:', error);
     res.status(500).send('Error al obtener productos');
   }
 });
+
+
 
 //ELIMINAR CANTIDAD PRODUCTOS//
 app.delete('/products/:id', async (req, res) => {
@@ -214,7 +225,7 @@ app.patch('/products/:productId/update-stock', async (req, res) => {
 
   try {
       const result = await pool.query(
-          'UPDATE products SET quantity = $1 WHERE id = $2 RETURNING *',
+          'UPDATE products SET quantity = $1 WHERE id = $2 RETURNING  id, name, description, price, quantity, image_url, category_url',
           [quantity, productId]
       );
 
@@ -250,7 +261,7 @@ app.patch('/products/:productId/update-stock', async (req, res) => {
           const { id, quantity } = product;
   
           const result = await client.query(
-            'UPDATE products SET quantity = quantity - $1 WHERE id = $2 AND quantity >= $1 RETURNING *',
+            'UPDATE products SET quantity = quantity - $1 WHERE id = $2 AND quantity >= $1 RETURNING  id, name, description, price, quantity, image_url, category_url',
             [quantity, id]
           );
   
