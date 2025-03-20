@@ -225,7 +225,7 @@ app.patch('/products/:productId/update-stock', async (req, res) => {
 
   try {
       const result = await pool.query(
-          'UPDATE products SET quantity = $1 WHERE id = $2 RETURNING  id, name, description, price, quantity, image_url, category_url',
+          'UPDATE products SET quantity = $1 WHERE id = $2 RETURNING *',
           [quantity, productId]
       );
 
@@ -261,7 +261,7 @@ app.patch('/products/:productId/update-stock', async (req, res) => {
           const { id, quantity } = product;
   
           const result = await client.query(
-            'UPDATE products SET quantity = quantity - $1 WHERE id = $2 AND quantity >= $1 RETURNING  id, name, description, price, quantity, image_url, category_url',
+            'UPDATE products SET quantity = quantity - $1 WHERE id = $2 AND quantity >= $1 RETURNING *',
             [quantity, id]
           );
   
