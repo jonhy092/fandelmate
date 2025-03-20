@@ -60,21 +60,18 @@ document.addEventListener("DOMContentLoaded", () => {
 //ACTUALIZAR STOCK DE PRODUCTOS//
 async function updateStock(event) {
     const productId = event.target.dataset.id;
-    let newQuantity = prompt("Ingrese la nueva cantidad:"); // Cambiar de const a let
+    const newQuantity = prompt("Ingrese la nueva cantidad:");
 
     if (!newQuantity || isNaN(newQuantity) || newQuantity < 0) {
         alert("Cantidad inválida.");
         return;
     }
 
-    newQuantity = Number(newQuantity); // Ahora podemos reasignar sin error
-    console.log("Enviando datos al backend:", { productId, newQuantity }); // <-- LOG PARA DEPURAR
-
     try {
-        const response = await fetch(`http://localhost:3001/products/${productId}/reduce-stock`, {
+        const response = await fetch(`http://localhost:3001/products/${productId}/update-stock`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ quantity: newQuantity }) // Enviar como número
+            body: JSON.stringify({ quantity: parseInt(newQuantity) })
         });
 
         const data = await response.json();
@@ -84,12 +81,13 @@ async function updateStock(event) {
         }
 
         alert("Stock actualizado.");
-        loadProducts();
+        loadProducts(); // Recargar la lista de productos
     } catch (error) {
         console.error(error);
         alert("Error al actualizar stock.");
     }
 }
+//ELIMINAR PRODUCTOS//
 
 
     async function deleteProduct(event) {

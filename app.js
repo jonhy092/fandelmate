@@ -200,37 +200,35 @@ app.delete('/products/remove-empty', async (req, res) => {
 });
 
 // MODIFICAR EL STOCK DE PRODUCTOS//
-app.patch('/products/:productId/reduce-stock', async (req, res) => {
+app.patch('/products/:productId/update-stock', async (req, res) => {
   const { productId } = req.params;
   let { quantity } = req.body;
 
-  console.log("Datos recibidos en el backend:", { productId, quantity }); // <-- LOG PARA DEPURAR
+  console.log("📥 Datos recibidos en el backend:", { productId, quantity });
 
   // Validar si quantity es un número válido
   quantity = Number(quantity);
-  if (!quantity || isNaN(quantity) || quantity <= 0) {
-      console.log("Cantidad inválida:", quantity); // <-- LOG PARA DEPURAR
+  if (isNaN(quantity) || quantity < 0) {
       return res.status(400).send({ error: 'Cantidad inválida' });
   }
 
   try {
       const result = await pool.query(
-          'UPDATE products SET quantity = quantity - $1 WHERE id = $2 AND quantity >= $1 RETURNING *',
+          'UPDATE products SET quantity = $1 WHERE id = $2 RETURNING *',
           [quantity, productId]
       );
 
       if (result.rows.length === 0) {
-          console.log("Stock insuficiente o producto no encontrado"); // <-- LOG PARA DEPURAR
-          return res.status(400).send({ error: 'Stock insuficiente o producto no encontrado' });
+          return res.status(404).send({ error: 'Producto no encontrado' });
       }
 
-      console.log("Stock actualizado correctamente:", result.rows[0]); // <-- LOG PARA DEPURAR
       res.status(200).send({ message: 'Stock actualizado', product: result.rows[0] });
   } catch (error) {
-      console.error('Error al actualizar el stock:', error);
+      console.error('❌ Error al actualizar el stock:', error);
       res.status(500).send({ error: 'Error al actualizar el stock' });
   }
 });
+
 
    // MANEJO REDUCCION DEL STOCK //
    
