@@ -71,88 +71,22 @@
     </style>
 </head>
 <body>
-    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
-        <button onclick="window.print()" class="print-button">Imprimir Factura</button>
-        <button onclick="window.location.href='/'" class="print-button" style="background: #6c757d;">Volver</button>
-    </div>
-
-    <div class="factura">
-        <% if (config.logo_src) { %>
-            <img src="<%= config.logo_src %>" alt="Logo" class="logo mb-3">
-        <% } %>
-
-        <div class="text-center mb-3">
-            <h2 style="margin: 0;"><%= config.nombre_negocio %></h2>
-            <% if (config.direccion) { %>
-                <div class="small"><%= config.direccion %></div>
-            <% } %>
-            <% if (config.telefono) { %>
-                <div class="small">Tel: <%= config.telefono %></div>
-            <% } %>
-            <% if (config.nit) { %>
-                <div class="small">NIT: <%= config.nit %></div>
-            <% } %>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="mb-3">
-            <div>Factura #: <%= factura.id %></div>
-            <div>Fecha: <%= new Date(factura.fecha).toLocaleString() %></div>
-        </div>
-
-        <div class="mb-3">
-            <div><strong>Cliente:</strong> <%= factura.cliente_nombre %></div>
-            <% if (factura.direccion) { %>
-                <div><strong>Dirección:</strong> <%= factura.direccion %></div>
-            <% } %>
-            <% if (factura.telefono) { %>
-                <div><strong>Teléfono:</strong> <%= factura.telefono %></div>
-            <% } %>
-        </div>
-
-        <div class="divider"></div>
-
+    <div>
+        <h3>Listado de Facturas</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Producto</th>
-                    <th>Cant.</th>
-                    <th class="text-right">Precio</th>
-                    <th class="text-right">Total</th>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody>
-                <% detalles.forEach(function(item) { %>
-                    <tr>
-                        <td><%= item.producto_nombre %></td>
-                        <td><%= Number(item.cantidad).toFixed(2) %><%= item.unidad_medida %></td>
-                        <td class="text-right">$<%= Number(item.precio_unitario).toFixed(2) %></td>
-                        <td class="text-right">$<%= Number(item.subtotal).toFixed(2) %></td>
-                    </tr>
-                <% }); %>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3" class="text-right"><strong>Total:</strong></td>
-                    <td class="text-right"><strong>$<%= Number(factura.total).toFixed(2) %></strong></td>
-                </tr>
-            </tfoot>
+            <tbody id="facturas-list"></tbody>
         </table>
-
-        <div class="divider"></div>
-
-        <div class="text-center small">
-            <div><strong>Forma de Pago:</strong> <%= factura.forma_pago.charAt(0).toUpperCase() + factura.forma_pago.slice(1) %></div>
-            <% if (config.qr_src) { %>
-                <div class="mt-3 mb-3">
-                    <img src="<%= config.qr_src %>" alt="QR para transferencia" style="max-width: 150px;">
-                </div>
-            <% } %>
-            <div class="mt-2">
-                <%= config.pie_pagina || '¡Gracias por su compra!' %>
-            </div>
-        </div>
     </div>
+    
 </body>
+
 </html> 

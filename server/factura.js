@@ -1,30 +1,50 @@
-//FRONT DE FACTURAS//
-document.getElementById('facturaForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const factura = {
-        razon_social: document.getElementById('razon_social').value,
-        domicilio_comercial: document.getElementById('domicilio_comercial').value,
-        condicion_iva: document.querySelector('input[name="condicion_iva"]:checked').value,
-        cuit: document.getElementById('cuit').value,
-        ingresos_brutos: document.getElementById('ingresos_brutos').value,
-        fecha_inicio_actividades: document.getElementById('fecha_inicio').value,
-        fecha_emision: new Date().toISOString().split('T')[0],
-    };
-    console.log(factura);
-    const res = await fetch('http://localhost:3001/api/facturas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(factura)
-    });
-    if (res.ok) alert('Factura generada correctamente');
-});
+document.addEventListener('DOMContentLoaded', () => {
+    cargarFacturas();
 
-document.getElementById('descargarFactura').addEventListener('click', () => {
-    const desde = document.getElementById('desde').value;
-    const hasta = document.getElementById('hasta').value;
-    if (desde && hasta) {
-        window.location.href = `http://localhost:3001/api/facturas/pdf?desde=${desde}&hasta=${hasta}`;
-    } else {
-        alert('Selecciona un rango de fechas');
+async function cargarFacturas() {
+    try {
+        const response = await fetch("http://localhost:3001/facturas");
+        const facturas = await response.json();
+        const facturasList = document.getElementById('facturas-list');
+        
+        facturasList.innerHTML = ''; // Limpiar la tabla antes de agregar nuevas filas
+        
+        facturas.forEach(factura => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${factura.id}</td>
+                <td>${factura.cliente_nombre}</td>
+                <td>${new Date(factura.fecha).toLocaleDateString()}</td>
+                <td>$${factura.total.toFixed(2)}</td>
+                <td><button class="btn-download" data-id="${factura.id}">Descargar PDF</button></td>
+            `;
+            facturasList.appendChild(row);
+        });
+
+        // Añadir evento a los botones de descarga
+        document.querySelectorAll('.btn-download').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const facturaId = e.target.getAttribute('data-id');
+                descargarFacturaPDF(facturaId);
+            });
+        });
+    } catch (error) {
+        console.error('Error al cargar facturas:', error);
     }
+}
+
+async function descargarFacturaPDF(facturaId) {
+    try {
+        const response = await fetch(`http://localhost:3001/factura-pdf/${facturaId}`);
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `factura-${facturaId}.pdf`;
+        link.click();
+    } catch (error) {
+        console.error('Error al descargar PDF:', error);
+    }
+}
 });
+//document.addEventListener('DOMContentLoaded', cargarFacturas);
+

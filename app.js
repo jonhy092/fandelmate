@@ -27,6 +27,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const app = express();
 const PORT = process.env.PORT || 3001;
 app.use(cors());
+//const fs = require('fs');
 
 app.use(express.json());// parseo JSON.. para que el body sea un json
 app.use(express.urlencoded({ extended: true }));
@@ -356,62 +357,74 @@ app.patch('/products/:productId/update-stock', async (req, res) => {
 crearTablaFactura();
 
 // Ruta para crear una nueva factura
-app.post('/api/facturas', async (req, res) => {
-  console.log('POST /api/facturas');
-  const { razon_social, domicilio_comercial, condicion_iva, cuit, ingresos_brutos, fecha_inicio_actividades, fecha_emision } = req.body;
-  console.log('Datos de la factura:', razon_social, domicilio_comercial, condicion_iva, cuit, ingresos_brutos, fecha_inicio_actividades, fecha_emision);
+app.post('/crear-factura', async (req, res) => {
+  const { cliente_nombre, direccion, telefono, productos, forma_pago, nit } = req.body;
+
+  // Calcular el total de la factura
+  let total = 0;
+  productos.forEach(producto => {
+      total += producto.subtotal;
+  });
+
+  // Guardar la factura en la base de datos
   try {
-    const result = await guardarFactura({ razon_social, domicilio_comercial, condicion_iva, cuit, ingresos_brutos, fecha_inicio_actividades, fecha_emision });
-    res.json({ message: 'Factura guardada', factura: result });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al guardar la factura' });
-  }
-});
+      const result = await pool.query(
+          `INSERT INTO facturas (cliente_nombre, direccion, telefono, fecha, total, forma_pago, nit)
+          VALUES ($1, $2, $3, NOW(), $4, $5, $6) RETURNING id`,
+          [cliente_nombre, direccion, telefono, total, forma_pago, nit]
+      );
 
-// Ruta para generar y descargar facturas en PDF por fecha
-app.get('/api/facturas/pdf', async (req, res) => {
-  const { desde, hasta } = req.query;
+      const factura_id = result.rows[0].id;
 
-  try {
-    const result = await obtenerFacturasPorFecha(desde, hasta);
-
-    if (result.length === 0) {
-      return res.status(404).json({ error: 'No hay facturas en ese rango de fechas' });
-    }
-
-    const doc = new PDFDocument();
-    const filePath = `facturas_${desde}_a_${hasta}.pdf`;
-    doc.pipe(fs.createWriteStream(filePath));
-
-    doc.fontSize(18).text('Facturación AFIP', { align: 'center' });
-    doc.moveDown();
-
-    result.forEach(factura => {
-      doc.fontSize(12).text(`Razón Social: ${factura.razon_social}`);
-      doc.text(`Domicilio Comercial: ${factura.domicilio_comercial}`);
-      doc.text(`Condición frente al IVA: ${factura.condicion_iva}`);
-      doc.text(`CUIT: ${factura.cuit}`);
-      doc.text(`Ingresos Brutos: ${factura.ingresos_brutos}`);
-      doc.text(`Fecha de Inicio de Actividades: ${factura.fecha_inicio_actividades}`);
-      doc.text(`Fecha de Emisión: ${factura.fecha_emision}`);
-      doc.moveDown();
-    });
-
-    doc.end();
-
-    res.download(filePath, (err) => {
-      if (err) {
-        console.error('Error al descargar el PDF:', err);
-        res.status(500).json({ error: 'Error al generar el PDF' });
+      // Guardar los detalles de la factura
+      for (let producto of productos) {
+          await pool.query(
+              `INSERT INTO detalles_factura (factura_id, producto_nombre, cantidad, unidad_medida, precio_unitario, subtotal)
+              VALUES ($1, $2, $3, $4, $5, $6)`,
+              [factura_id, producto.nombre, producto.cantidad, producto.unidad_medida, producto.precio_unitario, producto.subtotal]
+          );
       }
-      fs.unlinkSync(filePath); // Borra el archivo después de la descarga
-    });
 
+      res.status(200).json({ message: 'Factura creada con éxito', factura_id });
   } catch (error) {
-    res.status(500).json({ error: 'Error al generar el PDF' });
+      console.error('Error al crear factura:', error);
+      res.status(500).json({ error: 'Error al crear la factura' });
   }
 });
-  
+
+//GENERADOR DE PDF PARA BOLETA//
+
+
+app.get('/factura-pdf/:id', async (req, res) => {
+    const facturaId = req.params.id;
+
+    try {
+        // Obtener la factura y los detalles
+        const facturaResult = await pool.query('SELECT * FROM facturas WHERE id = $1', [facturaId]);
+        const factura = facturaResult.rows[0];
+        const detallesResult = await pool.query('SELECT * FROM detalles_factura WHERE factura_id = $1', [facturaId]);
+        const detalles = detallesResult.rows;
+
+        // Crear un documento PDF
+        const doc = new PDFDocument();
+        doc.pipe(res); // Enviar el archivo PDF directamente a la respuesta
+
+        doc.fontSize(16).text(`Factura #${factura.id}`, { align: 'center' });
+        doc.fontSize(12).text(`Fecha: ${new Date(factura.fecha).toLocaleString()}`);
+        doc.text(`Cliente: ${factura.cliente_nombre}`);
+        doc.text(`Total: $${factura.total.toFixed(2)}`);
+        doc.text('Detalles de la Factura:');
+        
+        detalles.forEach(detalle => {
+            doc.text(`${detalle.producto_nombre} - ${detalle.cantidad} ${detalle.unidad_medida} - $${detalle.precio_unitario} c/u`);
+        });
+
+        doc.end();
+    } catch (error) {
+        console.error('Error al generar PDF:', error);
+        res.status(500).json({ error: 'Error al generar el PDF' });
+    }
+});
 
 
   
