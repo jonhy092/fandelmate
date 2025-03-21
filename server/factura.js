@@ -1,50 +1,44 @@
-document.addEventListener('DOMContentLoaded', () => {
-    cargarFacturas();
-
-async function cargarFacturas() {
-    try {
-        const response = await fetch("http://localhost:3001/facturas");
-        const facturas = await response.json();
-        const facturasList = document.getElementById('facturas-list');
-        
-        facturasList.innerHTML = ''; // Limpiar la tabla antes de agregar nuevas filas
-        
-        facturas.forEach(factura => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${factura.id}</td>
-                <td>${factura.cliente_nombre}</td>
-                <td>${new Date(factura.fecha).toLocaleDateString()}</td>
-                <td>$${factura.total.toFixed(2)}</td>
-                <td><button class="btn-download" data-id="${factura.id}">Descargar PDF</button></td>
-            `;
-            facturasList.appendChild(row);
-        });
-
-        // Añadir evento a los botones de descarga
-        document.querySelectorAll('.btn-download').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const facturaId = e.target.getAttribute('data-id');
-                descargarFacturaPDF(facturaId);
-            });
-        });
-    } catch (error) {
-        console.error('Error al cargar facturas:', error);
-    }
-}
-
-async function descargarFacturaPDF(facturaId) {
-    try {
-        const response = await fetch(`http://localhost:3001/factura-pdf/${facturaId}`);
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `factura-${facturaId}.pdf`;
-        link.click();
-    } catch (error) {
-        console.error('Error al descargar PDF:', error);
-    }
-}
-});
-//document.addEventListener('DOMContentLoaded', cargarFacturas);
+document.addEventListener('DOMContentLoaded', function () {
+    // Datos de ejemplo de la factura (esto lo recuperamos del backend)
+    const cliente = {
+      razonSocial: 'Empresa Ejemplo S.A.',
+      cuit: '20-12345678-9',
+      dni: '12345678'
+    };
+  
+    const productos = [
+      { nombre: 'Producto 1', precio: 100, cantidad: 2 },
+      { nombre: 'Producto 2', precio: 200, cantidad: 1 }
+    ];
+  
+    // Fecha de emisión
+    const fechaEmision = new Date().toLocaleDateString();
+    document.getElementById('fecha-emision').textContent = fechaEmision;
+  
+    // Datos del cliente
+    document.getElementById('razon-social').textContent = cliente.razonSocial;
+    document.getElementById('cuit').textContent = cliente.cuit;
+    document.getElementById('dni').textContent = cliente.dni;
+  
+    // Rellenar la tabla de productos
+    let totalFactura = 0;
+    const productosLista = document.getElementById('productos-lista');
+    productos.forEach(producto => {
+      const totalProducto = producto.precio * producto.cantidad;
+      totalFactura += totalProducto;
+  
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${producto.nombre}</td>
+        <td>$${producto.precio}</td>
+        <td>${producto.cantidad}</td>
+        <td>$${totalProducto}</td>
+      `;
+      productosLista.appendChild(tr);
+    });
+  
+    // Mostrar el total
+    document.getElementById('total-factura').textContent = `$${totalFactura}`;
+  });
+  
 

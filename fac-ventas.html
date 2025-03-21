@@ -1,92 +1,57 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factura #<%= factura.id %></title>
-    <style>
-        @media print {
-            body {
-                width: 80mm;
-                margin: 0;
-                padding: 10px;
-            }
-            .no-print {
-                display: none;
-            }
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 80mm;
-            margin: 0 auto;
-            padding: 10px;
-        }
-
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .mb-3 { margin-bottom: 15px; }
-        .logo { max-width: 100px; margin: 0 auto; display: block; }
-        .divider { border-top: 1px dashed #000; margin: 10px 0; }
-        .small { font-size: 0.8em; }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        
-        th, td {
-            text-align: left;
-            padding: 3px;
-            font-size: 0.9em;
-        }
-
-        .print-button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 20px 0;
-        }
-
-        .print-button:hover {
-            background: #0056b3;
-        }
-
-        @media screen {
-            body {
-                background: #f0f0f0;
-                padding: 20px;
-            }
-            .factura {
-                background: white;
-                padding: 20px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                border-radius: 5px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factura</title>
+  <link rel="stylesheet" href="public/css/factura.css">
 </head>
 <body>
-    <div>
-        <h3>Listado de Facturas</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Cliente</th>
-                    <th>Fecha</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="facturas-list"></tbody>
-        </table>
-    </div>
-    
-</body>
+  <div class="factura">
+    <header class="header">
+      <div class="empresa">
+        <p><strong>Punto de Venta:</strong> 001</p>
+        <p><strong>Domicilio:</strong> Calle Ficticia 123, Ciudad</p>
+        <p><strong>Fecha de emisión:</strong> <span id="fecha-emision"></span></p>
+      </div>
+    </header>
 
-</html> 
+    <section class="cliente">
+      <h3>Datos Cliente</h3>
+      <p><strong>Razón Social:</strong> <span id="razon-social"></span></p>
+      <p><strong>Cuit:</strong> <span id="cuit"></span></p>
+      <p><strong>DNI:</strong> <span id="dni"></span></p>
+      <p><strong>Condición:</strong>
+        <select id="condicion">
+          <option value="iva">IVA Responsable Inscripto</option>
+          <option value="consumidor-final">Consumidor Final</option>
+        </select>
+      </p>
+    </section>
+
+    <section class="productos">
+      <h3>Productos</h3>
+      <table id="tabla-productos">
+        <thead>
+          <tr>
+            <th>Nombre del Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="productos-lista">
+          <!-- Aquí se mostrarán los productos dinámicamente -->
+        </tbody>
+      </table>
+      <p><strong>Total a pagar: </strong><span id="total-factura"></span></p>
+    </section>
+
+    <footer class="footer">
+      <p>Gracias por su compra</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -356,75 +356,46 @@ app.patch('/products/:productId/update-stock', async (req, res) => {
 };
 crearTablaFactura();
 
-// Ruta para crear una nueva factura
-app.post('/crear-factura', async (req, res) => {
-  const { cliente_nombre, direccion, telefono, productos, forma_pago, nit } = req.body;
 
-  // Calcular el total de la factura
-  let total = 0;
-  productos.forEach(producto => {
-      total += producto.subtotal;
-  });
+// Ruta para generar PDF
+app.post('/generate-pdf', (req, res) => {
+  const { factura, config } = req.body; // Recibe datos de la factura desde el frontend
+  
+  // Crear un documento PDF
+  const doc = new PDFDocument();
+  const filename = `factura_${factura.id}.pdf`;
+  const filePath = path.join(__dirname, 'pdfs', filename);
+  
+  doc.pipe(fs.createWriteStream(filePath));
 
-  // Guardar la factura en la base de datos
-  try {
-      const result = await pool.query(
-          `INSERT INTO facturas (cliente_nombre, direccion, telefono, fecha, total, forma_pago, nit)
-          VALUES ($1, $2, $3, NOW(), $4, $5, $6) RETURNING id`,
-          [cliente_nombre, direccion, telefono, total, forma_pago, nit]
-      );
+  // Agregar contenido al PDF
+  doc.fontSize(12).text(`Factura #: ${factura.id}`);
+  doc.text(`Fecha: ${new Date(factura.fecha).toLocaleString()}`);
+  doc.text(`Cliente: ${factura.cliente_nombre}`);
+  doc.text(`Total: $${factura.total.toFixed(2)}`);
+  
+  // Aquí puedes agregar más detalles como productos, dirección, forma de pago, etc.
+  
+  doc.end();
 
-      const factura_id = result.rows[0].id;
-
-      // Guardar los detalles de la factura
-      for (let producto of productos) {
-          await pool.query(
-              `INSERT INTO detalles_factura (factura_id, producto_nombre, cantidad, unidad_medida, precio_unitario, subtotal)
-              VALUES ($1, $2, $3, $4, $5, $6)`,
-              [factura_id, producto.nombre, producto.cantidad, producto.unidad_medida, producto.precio_unitario, producto.subtotal]
-          );
-      }
-
-      res.status(200).json({ message: 'Factura creada con éxito', factura_id });
-  } catch (error) {
-      console.error('Error al crear factura:', error);
-      res.status(500).json({ error: 'Error al crear la factura' });
-  }
+  // Enviar la ruta del archivo PDF generado
+  res.json({ filePath });
 });
 
-//GENERADOR DE PDF PARA BOLETA//
-
-
-app.get('/factura-pdf/:id', async (req, res) => {
-    const facturaId = req.params.id;
-
-    try {
-        // Obtener la factura y los detalles
-        const facturaResult = await pool.query('SELECT * FROM facturas WHERE id = $1', [facturaId]);
-        const factura = facturaResult.rows[0];
-        const detallesResult = await pool.query('SELECT * FROM detalles_factura WHERE factura_id = $1', [facturaId]);
-        const detalles = detallesResult.rows;
-
-        // Crear un documento PDF
-        const doc = new PDFDocument();
-        doc.pipe(res); // Enviar el archivo PDF directamente a la respuesta
-
-        doc.fontSize(16).text(`Factura #${factura.id}`, { align: 'center' });
-        doc.fontSize(12).text(`Fecha: ${new Date(factura.fecha).toLocaleString()}`);
-        doc.text(`Cliente: ${factura.cliente_nombre}`);
-        doc.text(`Total: $${factura.total.toFixed(2)}`);
-        doc.text('Detalles de la Factura:');
-        
-        detalles.forEach(detalle => {
-            doc.text(`${detalle.producto_nombre} - ${detalle.cantidad} ${detalle.unidad_medida} - $${detalle.precio_unitario} c/u`);
-        });
-
-        doc.end();
-    } catch (error) {
-        console.error('Error al generar PDF:', error);
-        res.status(500).json({ error: 'Error al generar el PDF' });
-    }
+// Ruta para listar las facturas
+app.get('/list-facturas', (req, res) => {
+  // Obtener la lista de facturas desde la base de datos (aquí simulado)
+  const facturas = [
+      { id: 1, cliente_nombre: 'Juan Pérez', total: 100, fecha: new Date() },
+      { id: 2, cliente_nombre: 'María Gómez', total: 150, fecha: new Date() }
+  ];
+  
+  res.json(facturas);
 });
+
+// Servir archivos estáticos
+app.use(express.static('pdfs'));
+
 
 
   

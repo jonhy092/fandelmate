@@ -1,0 +1,49 @@
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  .factura {
+    width: 300px;
+    padding: 20px;
+    border: 1px solid #000;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+  }
+  
+  header .empresa,
+  footer {
+    text-align: center;
+  }
+  
+  h3 {
+    text-align: center;
+  }
+  
+  #tabla-productos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+  
+  #tabla-productos th, #tabla-productos td {
+    text-align: left;
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  select {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+  }
+  
+  footer p {
+    margin-top: 20px;
+    font-size: 12px;
+  }
+  
