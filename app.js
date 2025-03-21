@@ -368,56 +368,89 @@ app.get('/productos', async (req, res) => {
   }
 });
 
+// Endpoint para generar factura
 app.post('/factura', async (req, res) => {
   try {
-    console.log("Datos recibidos en /factura:", req.body);
     const { razonSocial, cuit, dni, condicion, formaPago, productos } = req.body;
 
+    // Validaciones
     if (!razonSocial || !productos || productos.length === 0) {
-      return res.status(400).json({ error: "Faltan datos de la factura" });
+      return res.status(400).json({ 
+        error: "Faltan datos obligatorios de la factura" 
+      });
     }
 
     let total = 0;
-
-    // Verificar que cada producto existe en la BD y obtener su precio real
-    for (let producto of productos) {
-      const productoResult = await pool.query("SELECT precio FROM products WHERE id = $1", [producto.idProducto]);
-
-      if (productoResult.rows.length === 0) {
-        return res.status(400).json({ error: `El producto con ID ${producto.idProducto} no existe` });
+    for (const producto of productos) {
+      if (!producto.idProducto || !producto.cantidad || !producto.precio) {
+        return res.status(400).json({
+          error: `El producto con ID ${producto.idProducto} está incompleto.`
+        });
       }
 
-      const precioReal = productoResult.rows[0].precio;
-      total += precioReal * producto.cantidad;
+      const result = await pool.query(
+        'SELECT id, precio FROM products WHERE id = $1',
+        [producto.idProducto]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: `El producto con ID ${producto.idProducto} no existe`
+        });
+      }
+
+      total += result.rows[0].precio * producto.cantidad;
     }
 
-    // Insertar cliente
-    const clienteResult = await pool.query(
-      'INSERT INTO clientes (razon_social, cuit, dni, condicion) VALUES ($1, $2, $3, $4) RETURNING id',
-      [razonSocial, cuit, dni, condicion]
+    // Verificar si el cliente existe o insertarlo
+    const clienteCheck = await pool.query(
+      'SELECT id FROM clientes WHERE dni = $1',
+      [dni]
     );
-    const clienteId = clienteResult.rows[0].id;
 
-    // Insertar factura
+    let clienteId;
+    if (clienteCheck.rows.length > 0) {
+      clienteId = clienteCheck.rows[0].id;
+    } else {
+      const clienteResult = await pool.query(
+        'INSERT INTO clientes (razon_social, cuit, dni, condicion) VALUES ($1, $2, $3, $4) RETURNING id',
+        [razonSocial, cuit, dni, condicion]
+      );
+      clienteId = clienteResult.rows[0].id;
+    }
+
+    // Generar factura
     const facturaResult = await pool.query(
-      'INSERT INTO facturas (cliente_id, total, forma_pago) VALUES ($1, $2, $3) RETURNING id',
-      [clienteId, total, formaPago]
+      'INSERT INTO facturas (cliente_id, dni, condicion, total, forma_pago) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [clienteId, dni, condicion, total, formaPago]
     );
     const facturaId = facturaResult.rows[0].id;
 
-    // Insertar productos en la factura
-    for (let producto of productos) {
+    // Insertar productos
+    for (const producto of productos) {
+      const productoResult = await pool.query(
+        'SELECT precio FROM products WHERE id = $1',
+        [producto.idProducto]
+      );
+      
+      const precioUnitario = productoResult.rows[0].precio;
+
       await pool.query(
         'INSERT INTO facturas_productos (factura_id, producto_id, cantidad, precio_unitario) VALUES ($1, $2, $3, $4)',
-        [facturaId, producto.idProducto, producto.cantidad, producto.precio]
+        [facturaId, producto.idProducto, producto.cantidad, precioUnitario]
       );
     }
 
-    res.json({ mensaje: "Factura generada correctamente", facturaId });
+    res.json({ 
+      mensaje: "Factura generada correctamente",
+      facturaId 
+    });
 
   } catch (error) {
-    console.error("Error en /factura:", error);
-    res.status(500).json({ error: "Error al procesar la factura" });
+    console.error('Error al procesar factura:', error);
+    res.status(500).json({ 
+      error: "Error al procesar la factura" 
+    });
   }
 });
 
