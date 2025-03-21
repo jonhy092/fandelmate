@@ -360,7 +360,7 @@ crearTablaFactura();
 /// Obtener productos desde la base de datos
 app.get('/productos', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM productos');
+    const result = await pool.query('SELECT * FROM products');
     res.json({ productos: result.rows });
   } catch (error) {
     console.error(error);
@@ -368,26 +368,31 @@ app.get('/productos', async (req, res) => {
   }
 });
 
-// Crear una nueva factura
 app.post('/factura', async (req, res) => {
-  const { razonSocial, cuit, dni, condicion, formaPago, productos, total } = req.body;
+  const { razonSocial, cuit, dni, condicion, formaPago, productos } = req.body;
+
+  // Calcular el total de la factura basado en los productos
+  let total = 0;
+  for (let producto of productos) {
+    total += producto.precio * producto.cantidad;
+  }
 
   try {
-    // Insertar los datos del cliente en la base de datos (ajustar a tu modelo)
+    // Insertar los datos del cliente en la base de datos
     const clienteResult = await pool.query(
       'INSERT INTO clientes (razon_social, cuit, dni, condicion) VALUES ($1, $2, $3, $4) RETURNING id',
       [razonSocial, cuit, dni, condicion]
     );
     const clienteId = clienteResult.rows[0].id;
 
-    // Insertar la factura
+    // Insertar la factura en la base de datos
     const facturaResult = await pool.query(
       'INSERT INTO facturas (cliente_id, total, forma_pago) VALUES ($1, $2, $3) RETURNING id',
       [clienteId, total, formaPago]
     );
     const facturaId = facturaResult.rows[0].id;
 
-    // Insertar los productos de la factura
+    // Insertar los productos en la tabla facturas_productos
     for (let producto of productos) {
       await pool.query(
         'INSERT INTO facturas_productos (factura_id, producto_id, cantidad) VALUES ($1, $2, $3)',
@@ -395,9 +400,9 @@ app.post('/factura', async (req, res) => {
       );
     }
 
-    res.json({ message: 'Factura generada exitosamente' });
+    res.json({ message: 'Factura generada exitosamente', facturaId });
   } catch (error) {
-    console.error(error);
+    console.error('Error al generar la factura:', error);
     res.status(500).send('Error al generar factura');
   }
 });
