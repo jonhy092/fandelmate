@@ -11,7 +11,7 @@
     <header class="header">
       <div class="empresa">
         <p><strong>Punto de Venta:</strong> 001</p>
-        <p><strong>Domicilio:</strong> Calle Ficticia 123, Ciudad</p>
+        <p><strong>Domicilio:</strong> Belgrano 23, Venado Tuerto</p>
         <p><strong>Fecha de emisión:</strong> <span id="fecha-emision"></span></p>
       </div>
     </header>
@@ -34,33 +34,36 @@
       </form>
     </section>
 
-    <!-- Selección de Productos -->
+    <!-- Barra de búsqueda y selección de productos -->
     <section class="productos">
       <h3>Seleccionar Productos</h3>
-      <button id="cargar-productos">Cargar Productos</button>
-      <table id="tabla-productos">
+      <input type="text" id="search-product" placeholder="Buscar producto...">
+      <ul id="product-list"></ul>
+
+      <table id="selected-products">
         <thead>
           <tr>
-            <th>ID Producto</th>
             <th>Producto</th>
             <th>Precio</th>
             <th>Cantidad</th>
             <th>Subtotal</th>
+         
           </tr>
         </thead>
-        <tbody id="productos-lista">
-          <!-- Aquí se mostrarán los productos dinámicamente -->
+        <tbody>
+          <!-- Aquí se agregarán los productos seleccionados -->
         </tbody>
       </table>
-      <p><strong>Total a pagar: </strong><span id="total-factura"></span></p>
 
-      <label for="forma-pago">Forma de Pago:</label>
-      <select id="forma-pago">
+      <p><strong>Total a pagar:</strong> <span id="total">$0</span></p>
+
+      <label for="payment-method">Forma de Pago:</label>
+      <select id="payment-method">
         <option value="efectivo">Efectivo</option>
         <option value="transferencia">Transferencia</option>
       </select>
 
-      <button id="generar-factura">Generar Factura</button>
+      <button id="generate-invoice">Generar Factura</button>
     </section>
 
     <footer class="footer">
@@ -68,6 +71,7 @@
     </footer>
   </div>
 
-  <script src="server/factura.js"></script>
+  <script src="server/factura.js" defer></script>
 </body>
 </html>
+

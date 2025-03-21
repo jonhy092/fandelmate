@@ -369,43 +369,58 @@ app.get('/productos', async (req, res) => {
 });
 
 app.post('/factura', async (req, res) => {
-  const { razonSocial, cuit, dni, condicion, formaPago, productos } = req.body;
-
-  // Calcular el total de la factura basado en los productos
-  let total = 0;
-  for (let producto of productos) {
-    total += producto.precio * producto.cantidad;
-  }
-
   try {
-    // Insertar los datos del cliente en la base de datos
+    console.log("Datos recibidos en /factura:", req.body);
+    const { razonSocial, cuit, dni, condicion, formaPago, productos } = req.body;
+
+    if (!razonSocial || !productos || productos.length === 0) {
+      return res.status(400).json({ error: "Faltan datos de la factura" });
+    }
+
+    let total = 0;
+
+    // Verificar que cada producto existe en la BD y obtener su precio real
+    for (let producto of productos) {
+      const productoResult = await pool.query("SELECT precio FROM products WHERE id = $1", [producto.idProducto]);
+
+      if (productoResult.rows.length === 0) {
+        return res.status(400).json({ error: `El producto con ID ${producto.idProducto} no existe` });
+      }
+
+      const precioReal = productoResult.rows[0].precio;
+      total += precioReal * producto.cantidad;
+    }
+
+    // Insertar cliente
     const clienteResult = await pool.query(
       'INSERT INTO clientes (razon_social, cuit, dni, condicion) VALUES ($1, $2, $3, $4) RETURNING id',
       [razonSocial, cuit, dni, condicion]
     );
     const clienteId = clienteResult.rows[0].id;
 
-    // Insertar la factura en la base de datos
+    // Insertar factura
     const facturaResult = await pool.query(
       'INSERT INTO facturas (cliente_id, total, forma_pago) VALUES ($1, $2, $3) RETURNING id',
       [clienteId, total, formaPago]
     );
     const facturaId = facturaResult.rows[0].id;
 
-    // Insertar los productos en la tabla facturas_productos
+    // Insertar productos en la factura
     for (let producto of productos) {
       await pool.query(
-        'INSERT INTO facturas_productos (factura_id, producto_id, cantidad) VALUES ($1, $2, $3)',
-        [facturaId, producto.idProducto, producto.cantidad]
+        'INSERT INTO facturas_productos (factura_id, producto_id, cantidad, precio_unitario) VALUES ($1, $2, $3, $4)',
+        [facturaId, producto.idProducto, producto.cantidad, producto.precio]
       );
     }
 
-    res.json({ message: 'Factura generada exitosamente', facturaId });
+    res.json({ mensaje: "Factura generada correctamente", facturaId });
+
   } catch (error) {
-    console.error('Error al generar la factura:', error);
-    res.status(500).send('Error al generar factura');
+    console.error("Error en /factura:", error);
+    res.status(500).json({ error: "Error al procesar la factura" });
   }
 });
+
 
 
 
