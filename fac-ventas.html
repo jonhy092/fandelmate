@@ -16,28 +16,36 @@
       </div>
     </header>
 
-    <section class="cliente">
-      <h3>Datos Cliente</h3>
-      <p><strong>Razón Social:</strong> <span id="razon-social"></span></p>
-      <p><strong>Cuit:</strong> <span id="cuit"></span></p>
-      <p><strong>DNI:</strong> <span id="dni"></span></p>
-      <p><strong>Condición:</strong>
+    <!-- Formulario de Cliente -->
+    <section class="cliente-form">
+      <h3>Ingresar Datos del Cliente</h3>
+      <form id="form-cliente">
+        <label for="razon-social">Razón Social:</label>
+        <input type="text" id="razon-social" required>
+        <label for="cuit">CUIT:</label>
+        <input type="text" id="cuit" required>
+        <label for="dni">DNI:</label>
+        <input type="text" id="dni" required>
+        <label for="condicion">Condición:</label>
         <select id="condicion">
           <option value="iva">IVA Responsable Inscripto</option>
           <option value="consumidor-final">Consumidor Final</option>
         </select>
-      </p>
+      </form>
     </section>
 
+    <!-- Selección de Productos -->
     <section class="productos">
-      <h3>Productos</h3>
+      <h3>Seleccionar Productos</h3>
+      <button id="cargar-productos">Cargar Productos</button>
       <table id="tabla-productos">
         <thead>
           <tr>
-            <th>Nombre del Producto</th>
+            <th>ID Producto</th>
+            <th>Producto</th>
             <th>Precio</th>
             <th>Cantidad</th>
-            <th>Total</th>
+            <th>Subtotal</th>
           </tr>
         </thead>
         <tbody id="productos-lista">
@@ -45,6 +53,14 @@
         </tbody>
       </table>
       <p><strong>Total a pagar: </strong><span id="total-factura"></span></p>
+
+      <label for="forma-pago">Forma de Pago:</label>
+      <select id="forma-pago">
+        <option value="efectivo">Efectivo</option>
+        <option value="transferencia">Transferencia</option>
+      </select>
+
+      <button id="generar-factura">Generar Factura</button>
     </section>
 
     <footer class="footer">
@@ -52,6 +68,6 @@
     </footer>
   </div>
 
-  <script src="app.js"></script>
+  <script src="server/factura.js"></script>
 </body>
 </html>

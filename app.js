@@ -357,44 +357,53 @@ app.patch('/products/:productId/update-stock', async (req, res) => {
 crearTablaFactura();
 
 
-// Ruta para generar PDF
-app.post('/generate-pdf', (req, res) => {
-  const { factura, config } = req.body; // Recibe datos de la factura desde el frontend
-  
-  // Crear un documento PDF
-  const doc = new PDFDocument();
-  const filename = `factura_${factura.id}.pdf`;
-  const filePath = path.join(__dirname, 'pdfs', filename);
-  
-  doc.pipe(fs.createWriteStream(filePath));
-
-  // Agregar contenido al PDF
-  doc.fontSize(12).text(`Factura #: ${factura.id}`);
-  doc.text(`Fecha: ${new Date(factura.fecha).toLocaleString()}`);
-  doc.text(`Cliente: ${factura.cliente_nombre}`);
-  doc.text(`Total: $${factura.total.toFixed(2)}`);
-  
-  // Aquí puedes agregar más detalles como productos, dirección, forma de pago, etc.
-  
-  doc.end();
-
-  // Enviar la ruta del archivo PDF generado
-  res.json({ filePath });
+/// Obtener productos desde la base de datos
+app.get('/productos', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM productos');
+    res.json({ productos: result.rows });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener productos');
+  }
 });
 
-// Ruta para listar las facturas
-app.get('/list-facturas', (req, res) => {
-  // Obtener la lista de facturas desde la base de datos (aquí simulado)
-  const facturas = [
-      { id: 1, cliente_nombre: 'Juan Pérez', total: 100, fecha: new Date() },
-      { id: 2, cliente_nombre: 'María Gómez', total: 150, fecha: new Date() }
-  ];
-  
-  res.json(facturas);
+// Crear una nueva factura
+app.post('/factura', async (req, res) => {
+  const { razonSocial, cuit, dni, condicion, formaPago, productos, total } = req.body;
+
+  try {
+    // Insertar los datos del cliente en la base de datos (ajustar a tu modelo)
+    const clienteResult = await pool.query(
+      'INSERT INTO clientes (razon_social, cuit, dni, condicion) VALUES ($1, $2, $3, $4) RETURNING id',
+      [razonSocial, cuit, dni, condicion]
+    );
+    const clienteId = clienteResult.rows[0].id;
+
+    // Insertar la factura
+    const facturaResult = await pool.query(
+      'INSERT INTO facturas (cliente_id, total, forma_pago) VALUES ($1, $2, $3) RETURNING id',
+      [clienteId, total, formaPago]
+    );
+    const facturaId = facturaResult.rows[0].id;
+
+    // Insertar los productos de la factura
+    for (let producto of productos) {
+      await pool.query(
+        'INSERT INTO facturas_productos (factura_id, producto_id, cantidad) VALUES ($1, $2, $3)',
+        [facturaId, producto.idProducto, producto.cantidad]
+      );
+    }
+
+    res.json({ message: 'Factura generada exitosamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al generar factura');
+  }
 });
 
-// Servir archivos estáticos
-app.use(express.static('pdfs'));
+
+
 
 
 
