@@ -44,11 +44,13 @@ searchInput.addEventListener("input", () => {
   }
 
   if (searchValue) {
-    const filteredProducts = productos.filter(p => p.nombre && p.nombre.toLowerCase().includes(searchValue));
+    const filteredProducts = productos.filter(p => p.name && p.name.toLowerCase().includes(searchValue));
+ 
 
     filteredProducts.forEach(product => {
       const item = document.createElement("li");
-      item.textContent = product.nombre;
+      item.textContent = product.name;
+
       item.addEventListener("click", () => selectProduct(product));
       productList.appendChild(item);
     });
@@ -80,7 +82,7 @@ function updateTable() {
   selectedProducts.forEach(product => {
       const row = document.createElement("tr");
       row.innerHTML = `
-          <td>${product.nombre}</td>
+          <td>${product.name}</td>
           <td>${product.precio}</td>
           <td><input type="number" min="1" value="${product.cantidad}" data-id="${product.id}"></td>
           <td class="subtotal">${product.precio * product.cantidad}</td>
