@@ -12,7 +12,7 @@ import pool  from './db.js';
 import dotenv from 'dotenv';
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
-
+import { Server } from "socket.io";
 
 
 // Obtener la ruta del directorio actual
@@ -455,7 +455,7 @@ app.post('/factura', async (req, res) => {
 });
 
 
-
+//CONEXION EN TIEMPO REAL/
 
 
 
