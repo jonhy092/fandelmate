@@ -2,6 +2,8 @@
 
 import express from 'express';
 //import { guardarFactura, obtenerFacturasPorFecha } from '../fan_mate3/app.js';
+import { createServer } from "http";
+import { Server } from "socket.io";
 import bcrypt from 'bcryptjs';
 import cors from 'cors';
 import jwt from'jsonwebtoken';
@@ -12,8 +14,10 @@ import pool  from './db.js';
 import dotenv from 'dotenv';
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
-import { Server } from "socket.io";
 
+
+
+//const server = require('http').createServer(app);
 
 // Obtener la ruta del directorio actual
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
@@ -25,7 +29,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 app.use(cors());
 //const fs = require('fs');
 
@@ -37,6 +41,42 @@ app.use(express.json());  // Habilita la lectura de JSON en las peticiones POST
 app.use(express.urlencoded({ extended: true })); // Habilita datos de formularios
 
 
+//CONEXION EN TIEMPO REAL CON SOCKET.IO//
+// 🔹 Crear servidor HTTP antes de Socket.io
+const server = createServer(app); 
+
+// 🔹 Configurar Socket.io
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+let pedidos = []; // Almacena pedidos temporalmente
+
+// Ruta para recibir pedidos
+app.post("/pedido", (req, res) => {
+  const pedido = req.body;
+  pedidos.push(pedido);
+
+  // Enviar notificación en tiempo real al administrador
+  io.emit("nuevoPedido", pedido);
+
+  res.status(201).json({ message: "Pedido recibido", pedido });
+});
+
+// Manejo de conexiones de administradores
+io.on("connection", (socket) => {
+  console.log("Un administrador se ha conectado.");
+
+  // Enviar pedidos previos cuando el admin se conecta
+  socket.emit("pedidosAnteriores", pedidos);
+});
+
+// 🔹 Usar `server.listen()` en lugar de `app.listen()`
+server.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
 
 
 // User login YA CREADOS...
@@ -455,7 +495,6 @@ app.post('/factura', async (req, res) => {
 });
 
 
-//CONEXION EN TIEMPO REAL/
 
 
 
