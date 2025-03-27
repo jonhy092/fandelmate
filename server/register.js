@@ -66,7 +66,7 @@ async function loadUsers() {
 // Ver usuario
 window.viewUser = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3002/api/users/${id}`);
+      const response = await fetch(`http://localhost:3001/api/users/${id}`);
       const user = await response.json();
       alert(`Usuario: ${user.username}`);
     } catch (error) {
@@ -83,7 +83,7 @@ window.viewUser = async (id) => {
     const password = document.getElementById('editPassword').value;
   
     try {
-      const response = await fetch(`http://localhost:3002/api/users/${id}`, {
+      const response = await fetch(`http://localhost:3001/api/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -116,7 +116,7 @@ window.viewUser = async (id) => {
   // ELIMINAR USUARIO//
   window.deleteUser = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3002/api/users/${id}`, {
+      const response = await fetch(`http://localhost:3001/api/users/${id}`, {
         method: 'DELETE',
       });
 

@@ -1,6 +1,6 @@
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 
-const socket = io("http://localhost:3002");
+const socket = io("http://localhost:3001");
 const pedidosTableBody = document.getElementById("pedidos-table-body");
 
 socket.on("nuevoPedido", (pedido) => {
