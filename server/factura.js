@@ -12,7 +12,7 @@ let selectedProducts = [];
 // Obtener productos desde la base de datos
 async function fetchProductos() {
   try {
-    const response = await fetch("http://localhost:3001/productos");
+    const response = await fetch("http://localhost:8080/productos");
     const data = await response.json();
 
     if (!Array.isArray(data.productos)) {
@@ -147,7 +147,7 @@ generateInvoiceButton.addEventListener("click", async () => {
   };
 
   try {
-    const response = await fetch("http://localhost:3001/factura", {
+    const response = await fetch("http://localhost:8080/factura", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(facturaData)
@@ -162,7 +162,7 @@ generateInvoiceButton.addEventListener("click", async () => {
     console.log('Factura generada:', data);
 
     // Descargar PDF
-    window.open(`http://localhost:3001/factura/descargar/${data.facturaId}`, '_blank');
+    window.open(`http://localhost:8080/factura/descargar/${data.facturaId}`, '_blank');
 
   } catch (error) {
     console.error('Error:', error);

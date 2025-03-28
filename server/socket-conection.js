@@ -1,6 +1,6 @@
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 
-const socket = io("http://localhost:3001");
+const socket = io("http://localhost:8080");
 
 document.querySelector(".btn-finish-buy").addEventListener("click", () => {
     const nombre = document.getElementById("nameAndSurname").value;
@@ -29,7 +29,7 @@ document.querySelector(".btn-finish-buy").addEventListener("click", () => {
     };
 
     // Enviar datos al backend
-    fetch("http://localhost:3001/pedido", {
+    fetch("http://localhost:8080/pedido", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(pedido)
