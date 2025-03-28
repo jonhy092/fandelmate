@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Datos a enviar:", data);
 
         // Enviar datos al backend
-        fetch('http://localhost:8080/guardar-remito', {
+        fetch('http://localhost:3001/guardar-remito', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)

@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function loadProducts() {
-        fetch("http://localhost:8080/products")
+        fetch("http://localhost:3001/products")
             .then(response => response.json())
             .then(products => {
                 console.log("Productos recibidos del backend:", products); // Verifica la respuesta en consola
@@ -68,7 +68,7 @@ async function updateStock(event) {
     }
 
     try {
-        const response = await fetch(`http://localhost:8080/products/${productId}/update-stock`, {
+        const response = await fetch(`http://localhost:3001/products/${productId}/update-stock`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ quantity: parseInt(newQuantity) })
@@ -95,7 +95,7 @@ async function updateStock(event) {
         if (!confirm("¿Estás seguro de eliminar este producto?")) return;
 
         try {
-            const response = await fetch(`http://localhost:8080/products/${productId}`, { method: "DELETE" });
+            const response = await fetch(`http://localhost:3001/products/${productId}`, { method: "DELETE" });
             if (!response.ok) {
                 throw new Error("Error al eliminar producto");
             }

@@ -29,7 +29,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3001;
 app.use(cors());
 //const fs = require('fs');
 
@@ -74,9 +74,9 @@ io.on("connection", (socket) => {
 });
 
 // 🔹 Usar `server.listen()` en lugar de `app.listen()`
-server.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+//server.listen(PORT, () => {
+  //console.log(`Servidor corriendo en http://localhost:${PORT}`);
+//});
 
 
 // User login YA CREADOS...
