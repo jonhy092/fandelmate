@@ -21,15 +21,16 @@ document.querySelector(".btn-finish-buy").addEventListener("click", () => {
     const total = productos.reduce((acc, p) => acc + p.subtotal, 0);
 
     const pedido = {
+        id: Date.now().toString(), // ID único
         cliente: { nombre, email, telefono, dni },
         envio: { direccion, fechaEntrega },
         productos,
         formaPago,
-        total
+        total,
+        fecha: new Date().toISOString()
     };
-
     // Enviar datos al backend
-    fetch("http://localhost:3001/pedido", {
+    fetch("http://localhost:3001/procesar-pedido/:id", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(pedido)

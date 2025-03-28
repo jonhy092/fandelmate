@@ -55,28 +55,40 @@ const io = new Server(server, {
 let pedidos = []; // Almacena pedidos temporalmente
 
 // Ruta para recibir pedidos
-app.post("/pedido", (req, res) => {
-  const pedido = req.body;
-  pedidos.push(pedido);
+app.post('/procesar-pedido/:id', async (req, res) => {
+  try {
+      const pedido = pedidos.find(p => p.id === req.params.id);
+      if (!pedido) {
+          return res.status(404).json({ error: "Pedido no encontrado" });
+      }
 
-  // Enviar notificación en tiempo real al administrador
-  io.emit("nuevoPedido", pedido);
-
-  res.status(201).json({ message: "Pedido recibido", pedido });
+      // Reducir stock (similar a tu lógica en /cart/checkout)
+      const client = await pool.connect();
+      try {
+          await client.query('BEGIN');
+          
+          for (const producto of pedido.productos) {
+              await client.query(
+                  'UPDATE products SET quantity = quantity - $1 WHERE id = $2',
+                  [producto.cantidad, producto.id]
+              );
+          }
+          
+          await client.query('COMMIT');
+          res.status(200).json({ message: "Pedido procesado y stock actualizado" });
+      } catch (error) {
+          await client.query('ROLLBACK');
+          throw error;
+      } finally {
+          client.release();
+      }
+  } catch (error) {
+      console.error('Error al procesar pedido:', error);
+      res.status(500).json({ error: "Error al procesar pedido" });
+  }
 });
 
-// Manejo de conexiones de administradores
-io.on("connection", (socket) => {
-  console.log("Un administrador se ha conectado.");
 
-  // Enviar pedidos previos cuando el admin se conecta
-  socket.emit("pedidosAnteriores", pedidos);
-});
-
-// 🔹 Usar `server.listen()` en lugar de `app.listen()`
-//server.listen(PORT, () => {
-  //console.log(`Servidor corriendo en http://localhost:${PORT}`);
-//});
 
 
 // User login YA CREADOS...
@@ -500,6 +512,7 @@ app.post('/factura', async (req, res) => {
 
 
   
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+// 🔹 Usar `server.listen()` en lugar de `app.listen()`
+server.listen(PORT, () => {
+console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
