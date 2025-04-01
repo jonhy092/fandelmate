@@ -1,38 +1,77 @@
 
 
 import express from 'express';
-//import { guardarFactura, obtenerFacturasPorFecha } from '../fan_mate3/app.js';
+import pkg from 'pg';
+
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
 import cors from 'cors';
-import jwt from'jsonwebtoken';
-import multer from 'multer';
-import path from 'path';
-import db from'./db.js';
-import pool  from './db.js';
+import jwt from 'jsonwebtoken';
+import { body, validationResult } from 'express-validator';
+import morgan from 'morgan';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import pool from './db.js';
+import db from './db.js';
 import dotenv from 'dotenv';
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import multer from 'multer';
+
+const app = express();
+
+
+
+
+const corsOptions = {
+  origin: 'http://127.0.0.1:5500', // Permite el origen de tu frontend
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Agrega PATCH aquí
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+// Aplica CORS antes de definir las rutas
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Manejo de preflight requests
 
 
 
 //const server = require('http').createServer(app);
 
 // Obtener la ruta del directorio actual
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
+//definicion de limiter//
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // límite de 100 solicitudes por IP
+  standardHeaders: true, // devuelve info en headers `RateLimit-*`
+  legacyHeaders: false, // desactiva los headers `X-RateLimit-*`
+});
+
+
+// Ahora puedes usar __dirname normalmente
+console.log(`Directorio actual: ${__dirname}`);
+const pedidoId = uuidv4();
 // Configurar dotenv
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 
 
 
-const app = express();
-const PORT = process.env.PORT || 3001;
-app.use(cors());
-//const fs = require('fs');
 
+
+// Middlewares de seguridad y monitoreo
+app.use(helmet());
+app.use(morgan('combined'));
+
+//const fs = require('fs');
+app.use(limiter);
 app.use(express.json());// parseo JSON.. para que el body sea un json
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
@@ -40,53 +79,325 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());  // Habilita la lectura de JSON en las peticiones POST
 app.use(express.urlencoded({ extended: true })); // Habilita datos de formularios
 
+const PORT = process.env.PORT || 3001;
 
 //CONEXION EN TIEMPO REAL CON SOCKET.IO//
-// 🔹 Crear servidor HTTP antes de Socket.io
-const server = createServer(app); 
-
-// 🔹 Configurar Socket.io
-const io = new Server(server, {
+// Configuración de Socket.io con autenticación
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
   cors: {
-    origin: "*",
-  },
-});
-
-let pedidos = []; // Almacena pedidos temporalmente
-
-// Ruta para recibir pedidos
-app.post('/procesar-pedido/:id', async (req, res) => {
-  try {
-      const pedido = pedidos.find(p => p.id === req.params.id);
-      if (!pedido) {
-          return res.status(404).json({ error: "Pedido no encontrado" });
-      }
-
-      // Reducir stock (similar a tu lógica en /cart/checkout)
-      const client = await pool.connect();
-      try {
-          await client.query('BEGIN');
-          
-          for (const producto of pedido.productos) {
-              await client.query(
-                  'UPDATE products SET quantity = quantity - $1 WHERE id = $2',
-                  [producto.cantidad, producto.id]
-              );
-          }
-          
-          await client.query('COMMIT');
-          res.status(200).json({ message: "Pedido procesado y stock actualizado" });
-      } catch (error) {
-          await client.query('ROLLBACK');
-          throw error;
-      } finally {
-          client.release();
-      }
-  } catch (error) {
-      console.error('Error al procesar pedido:', error);
-      res.status(500).json({ error: "Error al procesar pedido" });
+    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    methods: ["GET", "POST"]
   }
 });
+
+
+// Middleware de autenticación para Socket.io
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    return next(new Error('No autorizado'));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.user = decoded;
+    next();
+  } catch (err) {
+    return next(new Error('Token inválido'));
+  }
+});
+
+// Manejo de conexiones Socket.io autenticadas
+io.on('connection', (socket) => {
+  console.log(`Usuario conectado: ${socket.user.id}`);
+  
+  socket.on('disconnect', () => {
+    console.log(`Usuario desconectado: ${socket.user.id}`);
+  });
+});
+
+//***************** *//
+
+// Crear tabla de pedidos (ejecutar solo una vez)
+const crearTablas = async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS pedidos (
+        id VARCHAR(36) PRIMARY KEY,
+        cliente_nombre VARCHAR(255) NOT NULL,
+        cliente_email VARCHAR(255) NOT NULL,
+        cliente_telefono VARCHAR(20),
+        cliente_dni VARCHAR(20),
+        direccion TEXT,
+        fecha_entrega DATE,
+        forma_pago VARCHAR(50) NOT NULL,
+        necesita_envio BOOLEAN DEFAULT false,
+        tiene_descuento BOOLEAN DEFAULT false,
+        total DECIMAL(10, 2) NOT NULL,
+        estado VARCHAR(20) DEFAULT 'pendiente',
+        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        productos JSONB NOT NULL,
+        usuario_id INTEGER REFERENCES usuarios(id)
+      );
+    `);
+    console.log('Tablas creadas/verificadas');
+  } catch (err) {
+    console.error('Error al crear tablas:', err);
+  }
+};
+crearTablas();
+
+//***************** *//
+
+
+// Middleware de autenticación JWT
+const autenticar = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  if (!token) {
+    return res.status(401).json({ error: 'Acceso no autorizado' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.usuario = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Token inválido' });
+  }
+};
+
+// Middleware de validación de errores
+const validar = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
+
+// Middleware de manejo de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({ 
+      error: 'Error de validación',
+      detalles: err.message 
+    });
+  }
+  
+  if (err.code === '23505') { // Violación de unique constraint
+    return res.status(409).json({ 
+      error: 'Conflicto de datos',
+      detalles: 'El recurso ya existe'
+    });
+  }
+  
+  res.status(500).json({ 
+    error: 'Error interno del servidor',
+    mensaje: process.env.NODE_ENV === 'development' ? err.message : 'Ocurrió un error'
+  });
+});
+
+
+
+// Endpoint para crear pedidos con validación robusta
+app.post('/api/pedidos', [
+  autenticar,
+  body('cliente.nombre').trim().isLength({ min: 2 }).escape(),
+  body('cliente.email').isEmail().normalizeEmail(),
+  body('cliente.telefono').optional().trim().isLength({ min: 8 }),
+  body('cliente.dni').optional().trim().isLength({ min: 7 }),
+  body('envio.direccion').optional().trim().escape(),
+  body('envio.fechaEntrega').optional().isISO8601(),
+  body('formaPago').isIn(['cash-debit', 'credit', 'transfer']),
+  body('productos').isArray({ min: 1 }),
+  body('productos.*.id').isInt(),
+  body('productos.*.nombre').trim().notEmpty(),
+  body('productos.*.precio').isFloat({ min: 0 }),
+  body('productos.*.cantidad').isInt({ min: 1 }),
+  body('total').isFloat({ min: 0 }),
+  body('necesitaEnvio').optional().isBoolean(),
+  body('tieneDescuento').optional().isBoolean(),
+  validar
+], async (req, res) => {
+  const { 
+    cliente, 
+    envio, 
+    productos, 
+    formaPago, 
+    total,
+    necesitaEnvio = false,
+    tieneDescuento = false
+  } = req.body;
+
+  const pedidoId = uuidv4();
+  const client = await pool.connect();
+  
+  try {
+    await client.query('BEGIN');
+
+
+    //*****  */
+
+// 2. Crear pedido
+await client.query(
+  `INSERT INTO pedidos (
+    id, cliente_nombre, cliente_email, cliente_telefono, cliente_dni,
+    direccion, fecha_entrega, forma_pago, necesita_envio, tiene_descuento,
+    total, productos, usuario_id
+  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+  [
+    pedidoId,
+    cliente.nombre,
+    cliente.email,
+    cliente.telefono,
+    cliente.dni,
+    envio?.direccion,
+    envio?.fechaEntrega,
+    formaPago,
+    necesitaEnvio,
+    tieneDescuento,
+    total,
+    JSON.stringify(productos),
+    req.usuario.id
+  ]
+);
+
+// 3. Actualizar stock
+for (const producto of productos) {
+  await client.query(
+    'UPDATE products SET quantity = quantity - $1 WHERE id = $2',
+    [producto.cantidad, producto.id]
+  );
+}
+
+await client.query('COMMIT');
+
+// Emitir solo a usuarios autenticados como administradores
+io.to('admin').emit('nuevoPedido', rows[0]);
+    
+res.status(201).json({ 
+  success: true,
+  pedido: rows[0]
+});
+} catch (err) {
+await client.query('ROLLBACK');
+console.error('Error en transacción:', err);
+throw err; // Será manejado por el middleware de errores
+} finally {
+client.release();
+}
+});
+
+// Endpoint para obtener pedidos con paginación
+app.get('/api/pedidos', [
+  autenticar,
+  body('pagina').optional().isInt({ min: 1 }).toInt(),
+  body('limite').optional().isInt({ min: 1, max: 100 }).toInt(),
+  validar
+], async (req, res) => {
+  const pagina = req.body.pagina || 1;
+  const limite = req.body.limite || 10;
+  const offset = (pagina - 1) * limite;
+
+  try {
+    // Consulta para los pedidos
+    const { rows: pedidos } = await pool.query(
+      `SELECT * FROM pedidos 
+       ORDER BY fecha_creacion DESC
+       LIMIT $1 OFFSET $2`,
+      [limite, offset]
+    );
+
+    // Consulta para el conteo total
+    const { rows: [{ count }] } = await pool.query(
+      'SELECT COUNT(*) FROM pedidos'
+    );
+
+    res.json({
+      success: true,
+      data: pedidos,
+      paginacion: {
+        total: parseInt(count),
+        pagina,
+        totalPaginas: Math.ceil(count / limite),
+        limite
+      }
+    });
+  } catch (err) {
+    console.error('Error al obtener pedidos:', err);
+    throw err;
+  }
+});
+
+// Endpoint para actualizar estado de pedido
+app.put('/api/pedidos/:id/estado', [
+  autenticar,
+  body('estado').isIn(['pendiente', 'procesando', 'completado', 'cancelado']),
+  validar
+], async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body;
+
+  try {
+    const { rowCount } = await pool.query(
+      `UPDATE pedidos SET estado = $1 
+       WHERE id = $2 AND usuario_id = $3
+       RETURNING *`,
+      [estado, id, req.usuario.id]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ 
+        error: 'Pedido no encontrado o no autorizado' 
+      });
+    }
+
+    // Notificar a los clientes si es relevante
+    if (estado === 'completado') {
+      io.emit('pedidoActualizado', { id, estado });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error al actualizar estado:', err);
+    throw err;
+  }
+});
+
+
+
+
+//************************ */
+
+
+      // Reducir stock (similar a tu lógica en /cart/checkout)
+//       const client = await pool.connect();
+//       try {
+//           await client.query('BEGIN');
+          
+//           for (const producto of pedido.productos) {
+//               await client.query(
+//                   'UPDATE products SET quantity = quantity - $1 WHERE id = $2',
+//                   [producto.cantidad, producto.id]
+//               );
+//           }
+          
+//           await client.query('COMMIT');
+//           res.status(200).json({ message: "Pedido procesado y stock actualizado" });
+//       } catch (error) {
+//           await client.query('ROLLBACK');
+//           throw error;
+//       } finally {
+//           client.release();
+//       }
+//   } catch (error) {
+//       console.error('Error al procesar pedido:', error);
+//       res.status(500).json({ error: "Error al procesar pedido" });
+//   }
+// });
 
 
 
@@ -183,6 +494,16 @@ const storage = multer.diskStorage({
 //INICIALIZO MULTER
 
 const upload = multer({ storage});
+
+
+
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.sendStatus(204); // Responde sin contenido
+});
+
 
 //POST  PRODUCTS***//
 app.post('/products', upload.single('image'), async (req, res) => {
@@ -341,56 +662,6 @@ app.patch('/products/:productId/update-stock', async (req, res) => {
   });
 
   
-//RUTA DE REMITO//
-  app.post('/guardar-remito', async (req, res) => {
-    try {
-        let {
-            fecha,
-            cuit,
-            nombre,
-            domicilio,
-            localidad,
-            condiciones,
-            cantidad,
-            descripcion
-        } = req.body;
-
-        console.log('Datos recibidos:', req.body); // Para depuración
-
-        // Verificar si cantidad es un array y convertir a números
-        if (Array.isArray(cantidad)) {
-            cantidad = cantidad.map(num => parseInt(num, 10) || 0); // Convertir cada valor a número
-        } else {
-            cantidad = [parseInt(cantidad, 10) || 0]; // Convertir a array si es un solo valor
-        }
-
-        // Asegurar que descripcion es un array
-        if (!Array.isArray(descripcion)) {
-            descripcion = [descripcion]; // Convertir a array si es un solo valor
-        }
-
-        // Validar que ambos arrays tengan la misma longitud
-        if (cantidad.length !== descripcion.length) {
-            return res.status(400).json({ error: "Los arrays de cantidad y descripción no coinciden en longitud" });
-        }
-
-        // Insertar múltiples líneas si hay varias cantidades/descripciones
-        const query = `
-            INSERT INTO remitos (fecha, cuit, nombre, domicilio, localidad, condiciones, cantidad, descripcion)
-            VALUES ${cantidad.map((_, i) => `($1, $2, $3, $4, $5, $6, $${i + 7}, $${i + 8})`).join(", ")}
-            RETURNING *;
-        `;
-
-        const values = [fecha, cuit, nombre, domicilio, localidad, condiciones, ...cantidad.flat(), ...descripcion.flat()];
-
-        const result = await pool.query(query, values);
-
-        res.status(201).json({ message: "Remito guardado correctamente", remito: result.rows });
-    } catch (err) {
-        console.error('Error al guardar el remito:', err);
-        res.status(500).json({ error: "Error al guardar el remito" });
-    }
-});
 
   //TABLA DE FACTURACION//
   const crearTablaFactura = async () => {
@@ -508,11 +779,6 @@ app.post('/factura', async (req, res) => {
 
 
 
-
-
-
-  
-// 🔹 Usar `server.listen()` en lugar de `app.listen()`
-server.listen(PORT, () => {
-console.log(`Servidor corriendo en http://localhost:${PORT}`);
+httpServer.listen(PORT, () => {
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });

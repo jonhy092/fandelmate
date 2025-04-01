@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import pkg from 'pg';
 import path from 'path';
-
+const { Pool } = pkg; 
 // Obtener la ruta del directorio actual
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -10,7 +10,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 //console.log('Password:', typeof process.env.DB_PASSWORD, process.env.DB_PASSWORD);
 
 
-const { Pool } = pkg;
+
 
 // Crear el pool de conexiones
 const pool = new Pool({

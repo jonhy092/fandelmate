@@ -93,7 +93,7 @@
     <!-- Validación de token -->
     <script>
         if (!localStorage.getItem('token')) {
-            window.location.href = 'usuario.html';
+            window.location.href = 'index.html';
         }
     </script>
     
@@ -107,10 +107,11 @@
             
             <!-- Menú de opciones -->
             <div class="d-flex">
-                <a href="/fac-ventas.html"  class="btn btn-outline-light me-2" data-bs-toggle="tooltip" title="Facturar">
+                <a href="/stock.html"  class="btn btn-outline-light me-2" data-bs-toggle="tooltip" title="Stock">
+
                     <i class="bi bi-shop"></i>
                 </a>
-                <a href="/productos.html" class="btn btn-outline-light me-2" data-bs-toggle="tooltip" title="Productos">
+                <a href="/productos.html" class="btn btn-outline-light me-2" data-bs-toggle="tooltip" title="Pedidos">
                     <i class="bi bi-box"></i>
                 </a>
              
@@ -184,7 +185,7 @@
                
             </div>
         </div>
-        <div class="container mt-4">
+        <!-- <div class="container mt-4">
             <h2>Pedidos Recientes</h2>
             <table class="table table-bordered">
                 <thead>
@@ -199,9 +200,8 @@
                 </thead>
                 <tbody id="pedidos-table-body"></tbody>
             </table>
-        </div>
+        </div> -->
         
-        <script type="module" src="public/js/admin.js"></script>
         
     </main>
 
@@ -210,7 +210,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="server/gestion-productos.js" defer></script>
-    <script src="server/pedido.js" defer></script>
+    <script src="server/pedido.js"  type="module" defer></script>
     <script src="server/socket-conection.js" defer></script>
    
 </body>
