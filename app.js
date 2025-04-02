@@ -29,7 +29,7 @@ const app = express();
 
 
 const corsOptions = {
-  origin: 'http://127.0.0.1:5500', // Permite el origen de tu frontend
+  origin:[  'http://127.0.0.1:5500', 'http://localhost:3001'], // Permite el origen de tu frontend
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Agrega PATCH aquí
   allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -276,6 +276,7 @@ for (const producto of productos) {
 await client.query('COMMIT');
 
 // Emitir solo a usuarios autenticados como administradores
+const { rows } = await client.query('SELECT * FROM pedidos WHERE id = $1', [pedidoId]);
 io.to('admin').emit('nuevoPedido', rows[0]);
     
 res.status(201).json({ 

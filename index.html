@@ -363,107 +363,102 @@
     <!-------------------------------  FIN MENU CARRITO-------------------------------- -->
 
     <!------------------------------  INICIO CONFIRMACION DE COMPRA--------------------- -->
-    <div class="menu-checkout in-stack is-hidden">
-        <h2 class="checkout-title">Checkout</h2>
-        <div class= "checkout-container in-line">
-            <div class= "form-container">
-                <form>
-                    <fieldset class="checkout-info in-stack">             
-                        <div class="checkout-personal-info">
-                            <legend class="info-title">Datos Personales</legend>
-                            <div class="checkout-personal-info-inputs ">
-                                <label for= "nameAndSurname">
-                                    Nombre y apellido *
-                                    <input type="text" 
-                                        placeholder="p. ej.: fandelmate@gmail.com" 
-                                        name="Nombre y Apellido" required 
-                                        id="nameAndSurname" />
-                                </label>
-                                <label for="email">
-                                    Email *
-                                    <input type="email" 
-                                        placeholder="p. ej.: fandelmate@gmail.com" required
-                                        id="email" />
-                                </label>
-                            </div>
-                        </div>
-                    </fieldset>
-                    <!-- *** [ Comiezo Opciones de Pago ] *** -->
-                    <fieldset class="checkout-payment in-stack">
-                        <div class="checkout-section-container in-stack">
-                            <legend class="info-title">Opciones de pago</legend>
-                            <label for="cash-debit">
-                                <input type="radio" 
-                                       class= "pay-option"
-                                       name="payment" 
-                                       value="cash-debit" 
-                                       checked 
-                                       id="cash-debit"/>
-                                       Efectivo / Débito
-                                </input>
+    <!------------------------------  INICIO CONFIRMACION DE COMPRA--------------------- -->
+<div class="menu-checkout in-stack is-hidden">
+    <h2 class="checkout-title">Checkout</h2>
+    <div class="checkout-container in-line">
+        <div class="form-container">
+            <form id="checkoutForm">
+                <fieldset class="checkout-info in-stack">             
+                    <div class="checkout-personal-info">
+                        <legend class="info-title">Datos Personales</legend>
+                        <div class="checkout-personal-info-inputs">
+                            <label for="nameAndSurname">
+                                Nombre y apellido *
+                                <input type="text" placeholder="Ej: Juan Pérez" required id="nameAndSurname" />
                             </label>
-                            <label for="credit">
-                                <input type="radio" 
-                                       class= "pay-option"
-                                       name="payment" 
-                                       value="credit" 
-                                       id="credit"/>
-                                       Tarjeta de crédito
-                                </input>
+                            <label for="email">
+                                Email *
+                                <input type="email" placeholder="Ej: juan@example.com" required id="email" />
                             </label>
-                            <label for="delivery">
-                                <input type="checkbox" 
-                                       class= "pay-option"
-                                       name="delivery" 
-                                       id="delivery"/> 
-                                       Necesito envío
+                            <label for="phone">
+                                Teléfono *
+                                <input type="tel" placeholder="Ej: 1122334455" required id="phone" />
                             </label>
-                            <label for="discount">
-                                <input type="checkbox" 
-                                       class= "pay-option"
-                                       name="discount" 
-                                       id="discount"/> 
-                                       Tengo tarjeta de descuento
+                            <label for="dni">
+                                DNI *
+                                <input type="text" placeholder="Ej: 33444555" required id="dni" />
                             </label>
                         </div>
-                    </fieldset>
-                </form>
-            </div>
-            <!-- *** [ Fin Opciones de Pago ] *** -->
+                    </div>
+                </fieldset>
 
-            <!-- *** [ Comienzo Subtotales ] *** -->
-            <div class="cart-totals in-stack">
-                <h3 class="info-title">Resumen</h3>
-                <div>
-                    <p class="cart-subtotal">
-                        Subtotal $ <span class="cart-subtotal-value">0</span>
-                    </p>
-                    <p class="cart-tax is-hidden">
-                        Recargo $<span class="cart-tax-value">0</span>
-                    </p>
-                    <p class="cart-discount is-hidden">
-                        Descuento 10% $<span class="cart-discount-value">0</span>
-                    </p>
-                    <p class="cart-delivery is-hidden">
-                        Envío $<span class="cart-delivery-value">0</span>
-                    </p>
-                    <p class="cart-total">
-                        Total: $ <span class="cart-total-value">0</span>
-                    </p>
-                </div>
+                <!-- Opciones de pago y envío -->
+                <fieldset class="checkout-payment in-stack">
+                    <div class="checkout-section-container in-stack">
+                        <legend class="info-title">Opciones</legend>
+                        <label>
+                            <input type="radio" name="payment" value="cash-debit" id="payment-cash" checked>
+                            Efectivo/Débito
+                        </label>
+                        <label>
+                            <input type="radio" name="payment" value="credit" id="payment-credit">
+                            Tarjeta Crédito (10% recargo)
+                        </label>
+                        <label>
+                            <input type="checkbox" id="needs-shipping" name="needsShipping">
+                            Necesito envío (+$50)
+                        </label>
+                        <label>
+                            <input type="checkbox" id="has-discount" name="hasDiscount">
+                            Tengo descuento (10%)
+                        </label>
+                    </div>
+                </fieldset>
+
+                <!-- Sección de envío (aparece solo si necesita envío) -->
+                <fieldset class="checkout-shipping in-stack" id="shippingSection" style="display:none;">
+                    <legend class="info-title">Datos de Envío</legend>
+                    <label for="address">
+                        Dirección completa *
+                        <textarea id="address" placeholder="Calle, número, piso, departamento, localidad" required></textarea>
+                    </label>
+                </fieldset>
+            </form>
+        </div>
+
+        <!-- Resumen de compra -->
+        <div class="cart-totals in-stack">
+            <h3 class="info-title">Resumen</h3>
+            <div>
+                <p class="cart-subtotal">
+                    Subtotal $ <span class="cart-subtotal-value">0</span>
+                </p>
+                <p class="cart-tax is-hidden">
+                    Recargo $<span class="cart-tax-value">0</span>
+                </p>
+                <p class="cart-discount is-hidden">
+                    Descuento $<span class="cart-discount-value">0</span>
+                </p>
+                <p class="cart-delivery is-hidden">
+                    Envío $<span class="cart-delivery-value">0</span>
+                </p>
+                <p class="cart-total">
+                    Total: $ <span class="cart-total-value">0</span>
+                </p>
             </div>
         </div>
-        <!-- *** [ Fin Subtotales ] *** -->
-
-        <footer class="footer-checkout in-line">
-            <button type="button" class="btn-cancel-buy button button-simple-solid">
-                Seguir comprando
-            </button>
-            <button type="button" class="btn-finish-buy button button-simple-solid-reverse">
-                Finalizar
-            </button>
-        </footer>
     </div>
+
+    <footer class="footer-checkout in-line">
+        <button type="button" class="btn-cancel-buy button button-simple-solid">
+            Seguir comprando
+        </button>
+        <button type="submit" class="btn-finish-buy button button-simple-solid-reverse">
+            Finalizar compra
+        </button>
+    </footer>
+</div>
 
     <!-- ---------------------- FIN CONFIRMACION DE COMPRA --------------- -->
 

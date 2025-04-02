@@ -308,7 +308,19 @@ const counterProducts = document.querySelectorAll('.cart-qty');
 const cartFullMsg = document.querySelector('.cart-full');
 const cartEmptyMsg = document.querySelector('.cart-empty');
 const carrito = document.querySelector('.cart-products-added');
+const deliveryCheckbox = document.getElementById('delivery');
+//const shippingSection = document.getElementById('shippingSection');
 
+/*********************** 3-MOSTRAR U OCULTAR SECCIÓN DE ENVÍO ********************/
+if (deliveryCheckbox && shippingSection) {
+    deliveryCheckbox.addEventListener('change', function() {
+        shippingSection.style.display = this.checked ? 'block' : 'none';
+        const addressInput = document.getElementById('address');
+        if (addressInput) {
+            addressInput.required = this.checked;
+        }
+    });
+}
 
 let subtotalProductsAdded = 0; // empiezo con $0 de compra
 
@@ -420,23 +432,22 @@ const obtenerPlantillaProductoAgregado = (id, nombre, precio, imagen) => {
 };
 
 const showProductOnCart = (btnAddToCart) => {
-	const products = document.querySelectorAll('.product'); // Selector corregido
-	let productAdded = knowProduct(btnAddToCart, products);
+    const productAdded = knowProduct(btnAddToCart, document.querySelectorAll('.product'));
+    if (!productAdded) return;
 
-	if (!productAdded) {
-		console.error("Producto no encontrado", btnAddToCart.id);
-		return;
-	}
-
-	const plantilla = obtenerPlantillaProductoAgregado(
-		productAdded.dataset.id,
-		productAdded.dataset.name,
-		productAdded.dataset.price,
-		productAdded.dataset.image
-	);
-	carrito.insertAdjacentHTML('beforeend', plantilla);
+    const plantilla = `
+        <tr class="cart-product-added" 
+            data-id="${productAdded.dataset.id}" 
+            data-price="${productAdded.dataset.price}">
+            <td>${productAdded.dataset.name}</td>
+            <td>$${productAdded.dataset.price}</td>
+            <td><input type="number" min="1" value="1" class="cart-product-qty"></td>
+            <td>$${productAdded.dataset.price}</td>
+            <td><button class="remove-from-cart-btn" id="${productAdded.dataset.id}">Eliminar</button></td>
+        </tr>`;
+    
+    carrito.insertAdjacentHTML('beforeend', plantilla);
 };
-
 
 
 /*********************** 3-INICIALIZAR EVENTO MOSTRAR CARRITO ********************/
@@ -608,6 +619,13 @@ const btnOpenCheckout = document.querySelector('.btn-buy');
 const btnFinishBuy = document.querySelector('.btn-finish-buy');
 const btnCancelBuy = document.querySelector('.btn-cancel-buy');
 const menuCheckout = document.querySelector('.menu-checkout');
+const checkoutForm = document.getElementById('checkoutForm');
+
+
+
+
+
+
 
 //EVENTO QUE AL CLICKEAR FINALIZAR COMPRA, SE CARGA EL MODAL DE COMPRA FINALIZADA Y MANEJA EL STOCK//
 // Ejemplo de productos en el carrito
@@ -638,31 +656,87 @@ let cartProducts = [];
   
   // Botón "Finalizar Compra"
   document.querySelector('.btn-finish-buy').addEventListener('click', async () => {
-	if (cartProducts.length === 0) {
-	  alert('Compra finalizada con éxito!');
-	  return;
-	}
-  
-	try {
-	  const response = await fetch('http://localhost:3001/cart/checkout', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ products: cartProducts })
-	  });
-  
-	  if (response.ok) {
-		alert('Compra finalizada con éxito');
-		cartProducts = []; // Limpia el carrito
-		document.querySelector('.cart-subtotal-value').textContent = '0';
-		document.querySelector('.cart-total-value').textContent = '0';
-	  } else {
-		const errorData = await response.json();
-		alert(`Error: ${errorData.error || 'No se pudo finalizar la compra'}`);
-	  }
-	} catch (error) {
-	  console.error('Error al finalizar la compra:', error);
-	}
-  });
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            redirectToLogin();
+            return;
+        }
+
+        // Obtener datos del formulario
+        const nombre = document.getElementById('nameAndSurname').value;
+        const email = document.getElementById('email').value;
+        const telefono = document.getElementById('phone')?.value || "0000000000";
+        const dni = document.getElementById('dni')?.value || "00000000";
+        const formaPago = document.querySelector('input[name="payment"]:checked').value;
+        const necesitaEnvio = document.getElementById('delivery').checked;
+        const tieneDescuento = document.getElementById('discount').checked;
+        const direccion = necesitaEnvio ? document.getElementById('address').value : null;
+
+        // Obtener productos del carrito
+        const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(product => ({
+            id: parseInt(product.dataset.id),
+            nombre: product.querySelector('.cart-product-name').textContent,
+            precio: parseFloat(product.dataset.price),
+            cantidad: parseInt(product.querySelector('.cart-product-qty').value)
+        }));
+
+        if (productos.length === 0) {
+            throw new Error('El carrito está vacío');
+        }
+
+        const total = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+
+        // Crear objeto pedido
+        const pedido = {
+            cliente: { 
+                nombre, 
+                email, 
+                telefono, 
+                dni 
+            },
+            envio: necesitaEnvio ? { 
+                direccion, 
+                fechaEntrega: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+            } : null,
+            productos,
+            formaPago,
+            total,
+            necesitaEnvio,
+            tieneDescuento
+        };
+
+        // Enviar al backend
+        const response = await fetch('http://localhost:3001/api/pedidos', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(pedido)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Error al procesar el pedido');
+        }
+
+        const data = await response.json();
+        console.log('Pedido creado:', data);
+        
+        // Mostrar confirmación y limpiar carrito
+        alert('¡Pedido realizado con éxito!');
+        resetCounterCart();
+        resetPriceToSubtotal();
+        hideAllProductsOnCart();
+        hiddeCheckout();
+        hiddeCart();
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert(`Error: ${error.message}`);
+    }
+});
   
   
 
@@ -710,84 +784,174 @@ btnCancelBuy.onclick = () => {
 /*********************** 3- CALCULAR PRECIO TOTAL DEL CHECKOUT ********************/
 const allPayOptions = document.querySelectorAll('.pay-option');
 // checkboxes
-const cashOption = document.querySelector('#cash-debit');
-const creditOption = document.querySelector('#credit');
-const deliveryOption = document.querySelector('#delivery');
-const discountOption = document.querySelector('#discount');
-// output values span
+// Elementos de opciones de pago (usando IDs consistentes con el HTML)
+const cashOption = document.getElementById('payment-cash');
+const creditOption = document.getElementById('payment-credit');
+const deliveryOption = document.getElementById('needs-shipping');
+const discountOption = document.getElementById('has-discount');
+const shippingSection = document.getElementById('shippingSection');
+
+// Elementos de precios
+const cartSubtotalValue = document.querySelector('.cart-subtotal-value');
 const cartTaxValue = document.querySelector('.cart-tax-value');
-const discountValue = document.querySelector('.cart-discount-value');
-const deliveryValue = document.querySelector('.cart-delivery-value');
+const cartDiscountValue = document.querySelector('.cart-discount-value');
+const cartDeliveryValue = document.querySelector('.cart-delivery-value');
 const cartTotalValue = document.querySelector('.cart-total-value');
-
-//parrafos
-const cartTax = document.querySelector('.cart-tax');
-const discount = document.querySelector('.cart-discount');
-const delivery = document.querySelector('.cart-delivery');
-
-
-let cartTaxValueCalculated = 0;
-let deliveryPrice = 0;
-let discountCalculated = 0;
-let cartTotalValueCalculated;
-cartTotalValue.textContent = subtotalProductsAdded;
-
-const getCartTax = () => {
-	cartTaxValueCalculated = subtotalProductsAdded * 0.1;
-};
-
-const addDeliveryPrice = () => {
-	deliveryPrice = 50;
-};
-
-const getDiscount = () => {
-	discountCalculated = -subtotalProductsAdded * 0.1;
-};
-
-getTotal = () => {
-	if (creditOption.checked) {
-		getCartTax();
-		show(cartTax);
-	} else {
-		cartTaxValueCalculated = 0;
-		hide(cartTax);
-	}
-	if (deliveryOption.checked) {
-		addDeliveryPrice();
-		show(delivery);
-	} else {
-		deliveryPrice = 0;
-		hide(delivery);
-	}
-	if (discountOption.checked) {
-		getDiscount();
-		show(discount);
-	} else {
-		discountCalculated = 0;
-		hide(discount);
-	}
-
-	// Mostrar en pantalla
-	cartTaxValue.textContent = cartTaxValueCalculated.toFixed(2);
-	deliveryValue.textContent = deliveryPrice.toFixed(2);
-	discountValue.textContent = discountCalculated.toFixed(2);
-
-	totalValueCalculated = subtotalProductsAdded + deliveryPrice + discountCalculated + cartTaxValueCalculated;
-	cartTotalValue.textContent = totalValueCalculated.toFixed(2);
-};
-// inicializa calculo de precio total
-for (let payOption of allPayOptions) {
-	payOption.onclick = () => {
-		getTotal();
-	};
+// Mostrar/ocultar sección de envío
+if (deliveryOption && shippingSection) {
+    deliveryOption.addEventListener('change', function() {
+        shippingSection.style.display = this.checked ? 'block' : 'none';
+        document.getElementById('address').required = this.checked;
+    });
 }
 
-const resetOptionsPay = () => {
- cashOption.checked = true
- creditOption.checked = false 
- deliveryOption.checked = false
- discountOption.checked = false
+
+
+// Función para calcular el total del carrito
+function calculateTotal() {
+    const subtotal = parseFloat(cartSubtotalValue.textContent) || 0;
+    let tax = 0;
+    let discount = 0;
+    let deliveryCost = 0;
+
+    // Calcular recargo por crédito (10%)
+    if (creditOption?.checked) {
+        tax = subtotal * 0.1;
+        document.querySelector('.cart-tax').classList.remove('is-hidden');
+    } else {
+        document.querySelector('.cart-tax').classList.add('is-hidden');
+    }
+
+    // Calcular costo de envío ($50)
+    if (deliveryOption?.checked) {
+        deliveryCost = 50;
+        document.querySelector('.cart-delivery').classList.remove('is-hidden');
+    } else {
+        document.querySelector('.cart-delivery').classList.add('is-hidden');
+    }
+
+    // Calcular descuento (10%)
+    if (discountOption?.checked) {
+        discount = subtotal * -0.1;
+        document.querySelector('.cart-discount').classList.remove('is-hidden');
+    } else {
+        document.querySelector('.cart-discount').classList.add('is-hidden');
+    }
+
+    // Actualizar valores en la UI
+    if (cartTaxValue) cartTaxValue.textContent = tax.toFixed(2);
+    if (cartDiscountValue) cartDiscountValue.textContent = discount.toFixed(2);
+    if (cartDeliveryValue) cartDeliveryValue.textContent = deliveryCost.toFixed(2);
+
+    const total = subtotal + tax + discount + deliveryCost;
+    if (cartTotalValue) cartTotalValue.textContent = total.toFixed(2);
+    
+    return total;
 }
+
+// Evento para finalizar compra
+btnFinishBuy?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Validar formulario
+        if (!checkoutForm.checkValidity()) {
+            checkoutForm.reportValidity();
+            return;
+        }
+
+        // Obtener datos del formulario
+        const formData = {
+            cliente: {
+                nombre: document.getElementById('nameAndSurname').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('phone').value,
+                dni: document.getElementById('dni').value
+            },
+            formaPago: creditOption.checked ? 'credit' : 'cash-debit',
+            necesitaEnvio: deliveryOption.checked,
+            tieneDescuento: discountOption.checked,
+            direccion: deliveryOption.checked ? document.getElementById('address').value : null,
+            fechaEntrega: deliveryOption.checked ? 
+                new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : null
+        };
+
+        // Obtener productos del carrito
+        const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(item => ({
+            id: parseInt(item.dataset.id),
+            nombre: item.querySelector('.cart-product-name')?.textContent || 'Producto sin nombre',
+            precio: parseFloat(item.dataset.price) || 0,
+            cantidad: parseInt(item.querySelector('.cart-product-qty'))?.value || 1
+        }));
+
+        if (productos.length === 0) {
+            throw new Error('El carrito está vacío');
+        }
+
+        // Calcular total
+        const total = calculateTotal();
+
+        // Enviar pedido al backend
+        const response = await fetch('http://localhost:3001/api/pedidos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                ...formData,
+                productos,
+                total: total
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Error al procesar el pedido');
+        }
+
+        // Limpiar carrito y cerrar checkout
+        document.querySelector('.cart-products-added').innerHTML = '';
+        cartSubtotalValue.textContent = '0';
+        cartTotalValue.textContent = '0';
+        menuCheckout.classList.add('is-hidden');
+        document.body.classList.remove('no-scroll');
+        
+        alert('¡Pedido realizado con éxito!');
+    } catch (error) {
+        console.error('Error:', error);
+        alert(`Error: ${error.message}`);
+    }
+});
+
+// Inicialización de eventos
+document.addEventListener('DOMContentLoaded', () => {
+    // Eventos para actualizar el total cuando cambian las opciones
+    [cashOption, creditOption, deliveryOption, discountOption].forEach(option => {
+        if (option) {
+            option.addEventListener('change', calculateTotal);
+        }
+    });
+
+    // Abrir checkout
+    btnOpenCheckout?.addEventListener('click', () => {
+        menuCheckout.classList.remove('is-hidden');
+        document.body.classList.add('no-scroll');
+        calculateTotal();
+    });
+
+    // Cancelar checkout
+    btnCancelBuy?.addEventListener('click', () => {
+        menuCheckout.classList.add('is-hidden');
+        document.body.classList.remove('no-scroll');
+    });
+});
 // USANDO OBJETOS..
 const productos = [
 {
