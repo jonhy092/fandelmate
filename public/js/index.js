@@ -668,7 +668,8 @@ let cartProducts = [];
         const email = document.getElementById('email').value;
         const telefono = document.getElementById('phone')?.value || "0000000000";
         const dni = document.getElementById('dni')?.value || "00000000";
-        const formaPago = document.querySelector('input[name="payment"]:checked').value;
+        const paymentMethod = document.querySelector('input[name="payment"]:checked');
+        const formaPago = paymentMethod ? paymentMethod.value : 'cash-debit';
         const necesitaEnvio = document.getElementById('delivery').checked;
         const tieneDescuento = document.getElementById('discount').checked;
         const direccion = necesitaEnvio ? document.getElementById('address').value : null;
@@ -741,7 +742,16 @@ let cartProducts = [];
   
 
 /*********************** 2- ABRIR Y CERRAR CHECKOUT ********************/
-
+function resetOptionsPay(){
+	const cashOption = document.getElementById('payment-cash');
+	const creditOption = document.getElementById('payment-credit');
+	const deliveryOption = document.getElementById('needs-shipping');
+	const discountOption = document.getElementById('has-discount');
+	if (cashOption) cashOption.checked = true;
+	if (creditOption) creditOption.checked = false;
+	if (deliveryOption) deliveryOption.checked = false;
+	if (discountOption) discountOption.checked = false;
+}
 const showCheckout = () => {
   show(menuCheckout);
   menuCheckout.setAttribute('aria-hidden', false)
@@ -758,7 +768,7 @@ btnOpenCheckout.onclick = () => {
 	overlay.style.zIndex = '3';
 	bodyNoScroll();
 	showCheckout();
-	getTotal();
+	calculateTotal();
 };
 
 btnFinishBuy.onclick = () => {
@@ -799,11 +809,15 @@ const cartDeliveryValue = document.querySelector('.cart-delivery-value');
 const cartTotalValue = document.querySelector('.cart-total-value');
 // Mostrar/ocultar sección de envío
 if (deliveryOption && shippingSection) {
-    deliveryOption.addEventListener('change', function() {
-        shippingSection.style.display = this.checked ? 'block' : 'none';
-        document.getElementById('address').required = this.checked;
-    });
-}
+    deliveryOption?.addEventListener('change', function() {
+		const addressInput = document.getElementById('address');
+		if (addressInput) {
+			addressInput.required = this.checked;
+			if (!this.checked) {
+				addressInput.value = ''; // Limpiar el valor cuando se desactiva
+			}}
+		})
+	};
 
 
 
