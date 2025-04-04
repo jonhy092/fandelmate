@@ -330,6 +330,7 @@
                 
                 <div class="in-line">
                 <p><span class="cart-qty">0</span> producto(s) agregado(s)</p>
+
                 </div>
                 
                 <div class="cart-products-added">
@@ -364,7 +365,7 @@
 
     <!------------------------------  INICIO CONFIRMACION DE COMPRA--------------------- -->
     <!------------------------------  INICIO CONFIRMACION DE COMPRA--------------------- -->
-<div class="menu-checkout in-stack is-hidden">
+<div class="menu-checkout in-stack is-hidden" inert>
     <h2 class="checkout-title">Checkout</h2>
     <div class="checkout-container in-line">
         <div class="form-container">
@@ -375,19 +376,19 @@
                         <div class="checkout-personal-info-inputs">
                             <label for="nameAndSurname">
                                 Nombre y apellido *
-                                <input type="text" placeholder="Ej: Juan Pérez" required id="nameAndSurname" />
+                                <input type="text" placeholder="Ej: Juan Pérez"  id="nameAndSurname" />
                             </label>
                             <label for="email">
                                 Email *
-                                <input type="email" placeholder="Ej: juan@example.com" required id="email" />
+                                <input type="email" placeholder="Ej: juan@example.com"  id="email" />
                             </label>
                             <label for="phone">
                                 Teléfono *
-                                <input type="tel" placeholder="Ej: 1122334455" required id="phone" />
+                                <input type="tel" placeholder="Ej: 1122334455"  id="phone" />
                             </label>
                             <label for="dni">
                                 DNI *
-                                <input type="text" placeholder="Ej: 33444555" required id="dni" />
+                                <input type="text" placeholder="Ej: 33444555"  id="dni" />
                             </label>
                         </div>
                     </div>
@@ -421,7 +422,7 @@
                     <legend class="info-title">Datos de Envío</legend>
                     <label for="address">
                         Dirección completa *
-                        <textarea id="address" placeholder="Calle, número, piso, departamento, localidad" required></textarea>
+                        <textarea id="address" name="address" placeholder="Calle, número, piso, departamento, localidad" ></textarea>
                     </label>
                 </fieldset>
             </form>

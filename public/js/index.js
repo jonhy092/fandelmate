@@ -46,7 +46,7 @@ LImpiar Filtros
 /**************  1- SELECCIONAR ELEMENTOS *********** */
 
 const inputSearch = document.querySelector('#input-search');
-const products = document.querySelectorAll('product'); /*LISTA DE PRODUCTOS*/
+const products = document.querySelectorAll('.product'); /*LISTA DE PRODUCTOS*/
 const reviewFilters = document.getElementsByClassName('filter-review'); /*LISTA DE REVIEWS*/
 const categoryFilters = document.getElementsByClassName('filter-category'); /* LISTA DE CATEGORIAS*/
 const checkboxes = document.querySelectorAll('.filter'); /*LISTA DE CHECKBOXES*/
@@ -309,7 +309,7 @@ const cartFullMsg = document.querySelector('.cart-full');
 const cartEmptyMsg = document.querySelector('.cart-empty');
 const carrito = document.querySelector('.cart-products-added');
 const deliveryCheckbox = document.getElementById('delivery');
-//const shippingSection = document.getElementById('shippingSection');
+const shippingSection = document.getElementById('shippingSection');
 
 /*********************** 3-MOSTRAR U OCULTAR SECCIÓN DE ENVÍO ********************/
 if (deliveryCheckbox && shippingSection) {
@@ -413,16 +413,16 @@ addPriceToSubtotal = (btnAddToCart) => {
 };
 
 const obtenerPlantillaProductoAgregado = (id, nombre, precio, imagen) => {
-	return `<article class="cart-product-added" data-id="${id}" data-qty="1" data-price=${precio}>
-    <img src="${imagen}" alt="" class="cart-product-img" />
+	return `<article class="cart-product-added" data-id="${id}" data-qty="1" data-price=${products.precio}>
+    <img src="${products.imagen}" alt="" class="cart-product-img" />
     <div class="cart-product-details">
       <div class="cart-product-info">
-        <h3 class="cart-product-name">${nombre}</h3>
-        <button  type="button" class="remove-from-cart-btn" id="${id}"><i class="far fa-trash-alt"></i></button>
+        <h3 class="cart-product-name">${products.nombre}</h3>
+        <button  type="button" class="remove-from-cart-btn" id="${products.id}"><i class="far fa-trash-alt"></i></button>
       </div>
       <div class="cart-product-price-qty">
         <label>
-          <input data-precio="${precio}" type="number" min="0" value="1" class="cart-product-qty" />
+          <input data-precio="${products.precio}" type="number" min="0" value="1" class="cart-product-qty" />
           unidades
         </label>
         <p class="cart-product-price">x $${precio}</p>
@@ -431,23 +431,33 @@ const obtenerPlantillaProductoAgregado = (id, nombre, precio, imagen) => {
   </article>`;
 };
 
-const showProductOnCart = (btnAddToCart) => {
-    const productAdded = knowProduct(btnAddToCart, document.querySelectorAll('.product'));
-    if (!productAdded) return;
+
+function showProductOnCart(btnAddToCart) {
+    const id = btnAddToCart.getAttribute('id');
+    const name = btnAddToCart.closest('.product').getAttribute('data-name');
+    const price = btnAddToCart.closest('.product').getAttribute('data-price');
+
+    console.log("Agregando producto al carrito:", { id, name, price });
+
+    if (!id || !name || !price) {
+        console.error("Error: No se pudo obtener información del producto.");
+        return;
+    }
 
     const plantilla = `
         <tr class="cart-product-added" 
-            data-id="${productAdded.dataset.id}" 
-            data-price="${productAdded.dataset.price}">
-            <td>${productAdded.dataset.name}</td>
-            <td>$${productAdded.dataset.price}</td>
+            data-id="${id}" 
+            data-price="${price}">
+            <td>${name}</td>
+            <td>$${price}</td>
             <td><input type="number" min="1" value="1" class="cart-product-qty"></td>
-            <td>$${productAdded.dataset.price}</td>
-            <td><button class="remove-from-cart-btn" id="${productAdded.dataset.id}">Eliminar</button></td>
+            <td>$${price}</td>
+            <td><button class="remove-from-cart-btn" data-id="${id}">Eliminar</button></td>
         </tr>`;
     
     carrito.insertAdjacentHTML('beforeend', plantilla);
 };
+
 
 
 /*********************** 3-INICIALIZAR EVENTO MOSTRAR CARRITO ********************/
@@ -502,25 +512,25 @@ const addProductToTheCartList = (inputQty) => {
 
 /** Escucha eventos remover o agregar producto en carrito*/
 
-const listenEventsOnCart = () => {
-	const allBtnRemove = document.querySelectorAll('.remove-from-cart-btn');
-	console.log(allBtnRemove)
-	const allInputsProductQty = document.querySelectorAll('.cart-product-qty');
+// const listenEventsOnCart = () => {
+// 	const allBtnRemove = document.querySelectorAll('.remove-from-cart-btn');
+// 	console.log(allBtnRemove)
+// 	const allInputsProductQty = document.querySelectorAll('.cart-product-qty');
 
-	for (btnRemove of allBtnRemove) {
-		btnRemove.onclick = () => {
-			console.log(btnRemove)
-			removeProductOfTheList(btnRemove);
-		};
-	}
+// 	for (allBtnRemove of allBtnRemove) {
+// 		allBtnRemove.onclick = () => {
+// 			console.log(allBtnRemove)
+// 			removeProductOfTheList(allBtnRemove);
+// 		};
+// 	}
 
-	for (inputQty of allInputsProductQty) {
-		inputQty.onchange = () => {
-			console.log("apretaste sumar producto")
-			addProductToTheCartList(inputQty);
-		};
-	}
-};
+// 	for (inputQty of allInputsProductQty) {
+// 		inputQty.onchange = () => {
+// 			console.log("apretaste sumar producto")
+// 			addProductToTheCartList(inputQty);
+// 		};
+// 	}
+// };
 
 /** INICIALIZA BOTONES QUE AGREGAN O QUITAN PRODUCTOS  */
 
@@ -652,16 +662,20 @@ const checkoutForm = document.getElementById('checkoutForm');
 //});
 
   // Ejemplo de productos en el carrito
-let cartProducts = [];
+//let cartProducts = [];
   
+  // FUNCION DE CARRITO VACIO//
+  function mostrarMensajeCarritoVacio() {
+    alert("El carrito está vacío. Por favor, agrega productos antes de continuar.");
+}
   // Botón "Finalizar Compra"
-  document.querySelector('.btn-finish-buy').addEventListener('click', async () => {
+document.querySelector('.btn-finish-buy').addEventListener('click', async () => {  
     try {
         const token = localStorage.getItem('token');
         if (!token) {
             redirectToLogin();
             return;
-        }
+        }  
 
         // Obtener datos del formulario
         const nombre = document.getElementById('nameAndSurname').value;
@@ -670,74 +684,84 @@ let cartProducts = [];
         const dni = document.getElementById('dni')?.value || "00000000";
         const paymentMethod = document.querySelector('input[name="payment"]:checked');
         const formaPago = paymentMethod ? paymentMethod.value : 'cash-debit';
-        const necesitaEnvio = document.getElementById('delivery').checked;
-        const tieneDescuento = document.getElementById('discount').checked;
+        const necesitaEnvio = document.getElementById('needs-shipping').checked;
+        const tieneDescuento = document.getElementById('has-discount').checked;
         const direccion = necesitaEnvio ? document.getElementById('address').value : null;
 
         // Obtener productos del carrito
-        const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(product => ({
-            id: parseInt(product.dataset.id),
-            nombre: product.querySelector('.cart-product-name').textContent,
-            precio: parseFloat(product.dataset.price),
-            cantidad: parseInt(product.querySelector('.cart-product-qty').value)
+        const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(products => ({
+            id: parseInt(products.dataset.id),
+            nombre: products.querySelector('.cart-product-name').textContent,
+            precio: parseFloat(products.dataset.price),
+            cantidad: parseInt(products.querySelector('.cart-product-qty').value)
         }));
+		console.log("Productos detectados en el carrito:", productos);
 
         if (productos.length === 0) {
             throw new Error('El carrito está vacío');
         }
-
-        const total = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
-
-        // Crear objeto pedido
-        const pedido = {
-            cliente: { 
-                nombre, 
-                email, 
-                telefono, 
-                dni 
-            },
-            envio: necesitaEnvio ? { 
-                direccion, 
-                fechaEntrega: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-            } : null,
-            productos,
-            formaPago,
-            total,
-            necesitaEnvio,
-            tieneDescuento
-        };
-
-        // Enviar al backend
-        const response = await fetch('http://localhost:3001/api/pedidos', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(pedido)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Error al procesar el pedido');
-        }
-
-        const data = await response.json();
-        console.log('Pedido creado:', data);
         
-        // Mostrar confirmación y limpiar carrito
-        alert('¡Pedido realizado con éxito!');
-        resetCounterCart();
-        resetPriceToSubtotal();
-        hideAllProductsOnCart();
-        hiddeCheckout();
-        hiddeCart();
-
+        const total = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+        
+        // Aquí iría el resto de tu lógica de compra...
+        // Por ejemplo, enviar los datos al servidor
+        
     } catch (error) {
-        console.error('Error:', error);
-        alert(`Error: ${error.message}`);
+        console.error('Error al finalizar compra:', error);
+        alert(error.message);
     }
-});
+});  // <-- El cierre correcto del addEventListener
+
+//         // Crear objeto pedido
+//         const pedido = {
+//             cliente: { 
+//                 nombre, 
+//                 email, 
+//                 telefono, 
+//                 dni 
+//             },
+//             envio: necesitaEnvio ? { 
+//                 direccion, 
+//                 fechaEntrega: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+//             } : null,
+//             productos,
+//             formaPago,
+//             total,
+//             necesitaEnvio,
+//             tieneDescuento
+//         };
+
+//         // Enviar al backend
+//         const response = await fetch('http://localhost:3001/api/pedidos', {
+//             method: 'POST',
+//             headers: { 
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${token}`
+//             },
+//             body: JSON.stringify(pedido)
+//         });
+
+//         if (!response.ok) {
+//             const errorData = await response.json();
+//             throw new Error(errorData.error || 'Error al procesar el pedido');
+//         }
+
+//         const data = await response.json();
+//         console.log('Pedido creado:', data);
+        
+//         // Mostrar confirmación y limpiar carrito
+//         alert('¡Pedido realizado con éxito!');
+//         resetCounterCart();
+//         resetPriceToSubtotal();
+//         hideAllProductsOnCart();
+//         hiddeCheckout();
+//         hiddeCart();
+
+//     } catch (error) {
+//         console.error('Error:', error);
+//         alert(`Error: ${error.message}`);
+//     }
+// });
   
   
 
@@ -799,7 +823,7 @@ const cashOption = document.getElementById('payment-cash');
 const creditOption = document.getElementById('payment-credit');
 const deliveryOption = document.getElementById('needs-shipping');
 const discountOption = document.getElementById('has-discount');
-const shippingSection = document.getElementById('shippingSection');
+
 
 // Elementos de precios
 const cartSubtotalValue = document.querySelector('.cart-subtotal-value');
@@ -807,17 +831,7 @@ const cartTaxValue = document.querySelector('.cart-tax-value');
 const cartDiscountValue = document.querySelector('.cart-discount-value');
 const cartDeliveryValue = document.querySelector('.cart-delivery-value');
 const cartTotalValue = document.querySelector('.cart-total-value');
-// Mostrar/ocultar sección de envío
-if (deliveryOption && shippingSection) {
-    deliveryOption?.addEventListener('change', function() {
-		const addressInput = document.getElementById('address');
-		if (addressInput) {
-			addressInput.required = this.checked;
-			if (!this.checked) {
-				addressInput.value = ''; // Limpiar el valor cuando se desactiva
-			}}
-		})
-	};
+
 
 
 
@@ -897,16 +911,20 @@ btnFinishBuy?.addEventListener('click', async (e) => {
         };
 
         // Obtener productos del carrito
-        const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(item => ({
-            id: parseInt(item.dataset.id),
-            nombre: item.querySelector('.cart-product-name')?.textContent || 'Producto sin nombre',
-            precio: parseFloat(item.dataset.price) || 0,
-            cantidad: parseInt(item.querySelector('.cart-product-qty'))?.value || 1
-        }));
-
-        if (productos.length === 0) {
-            throw new Error('El carrito está vacío');
-        }
+        const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(item => {
+			const qtyElement = item.querySelector('.cart-product-qty');
+			return {
+			  id: parseInt(item.dataset.id),
+			  nombre: item.querySelector('.cart-product-name')?.textContent || 'Producto sin nombre',
+			  precio: parseFloat(item.dataset.price) || 0,
+			  cantidad: qtyElement ? parseInt(qtyElement.value) || 1 : 1
+			};
+		  }).filter(product => !isNaN(product.id)); // Filtra productos inválidos
+		  
+		  if (productos.length === 0) {
+			mostrarMensajeCarritoVacio(); // Función que actualiza la UI
+			throw new Error('No hay productos válidos en el carrito');
+		  }
 
         // Calcular total
         const total = calculateTotal();
@@ -967,7 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 // USANDO OBJETOS..
-const productos = [
+const productosFallback = [
 {
 	id: 0,
 	name: 'Mate Rosa',
@@ -1073,10 +1091,11 @@ const productsContainer = document.querySelector('.products-list');
 
 async function insertarProductos() {
   try {
-    const response = await fetch('http://localhost:3001/products');
-    if (!response.ok) throw new Error("Producto añadido correctamente");
-
-    const productos = await response.json();
+	const response = await fetch('http://localhost:3001/products');
+	if (!response.ok) throw new Error("Error al obtener productos");
+	
+	const productos = await response.json(); // ahora sí se declara bien
+	
 
     productsContainer.innerHTML = ''; // Limpia el contenedor
     productos.forEach(product => {
@@ -1133,6 +1152,41 @@ document.addEventListener('DOMContentLoaded', insertarProductos);
 	//agregarEventosCarrito(); // Asegura agregar eventos después de insertar productos
 	//agregarFiltradoCategorias();
 //}
+function listenEventsOnCart() {
+	const botonesEliminar = document.querySelectorAll('.remove-from-cart-btn');
+	const inputsCantidad = document.querySelectorAll('.cart-product-qty');
+
+	botonesEliminar.forEach(boton => {
+		boton.addEventListener('click', () => {
+			const fila = boton.closest('tr');
+			if (fila) {
+				fila.remove(); // Elimina la fila del carrito
+
+				// Actualiza subtotal y contador
+				updateCartSubtotal();
+				updateCartCounter();
+			}
+		});
+	});
+
+	inputsCantidad.forEach(input => {
+		input.addEventListener('input', () => {
+			const fila = input.closest('tr');
+			if (fila) {
+				const price = parseFloat(fila.dataset.price);
+				const cantidad = parseInt(input.value) || 1;
+
+				// Actualiza el subtotal de esa fila
+				fila.querySelectorAll('td')[3].textContent = `$${(price * cantidad).toFixed(2)}`;
+
+				// Actualiza subtotal general y contador
+				updateCartSubtotal();
+				updateCartCounter();
+			}
+		});
+	});
+}
+
 
 // FUNCIÓN PARA AGREGAR EVENTOS A LOS BOTONES "AGREGAR AL CARRITO"
 function agregarEventosCarrito() {
@@ -1171,7 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	insertarProductos();
 });
 
-
+	
 
 
 // function displayProducts(products) {
@@ -1223,4 +1277,3 @@ document.addEventListener('DOMContentLoaded', () => {
 // 	const emptyStar = '<i class="far fa-star" aria-hidden="true"></i>';
 // 	return fullStar.repeat(review) + emptyStar.repeat(5 - review);
 
-//
