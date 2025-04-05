@@ -413,51 +413,44 @@ addPriceToSubtotal = (btnAddToCart) => {
 };
 
 const obtenerPlantillaProductoAgregado = (id, nombre, precio, imagen) => {
-	return `<article class="cart-product-added" data-id="${id}" data-qty="1" data-price=${products.precio}>
-    <img src="${products.imagen}" alt="" class="cart-product-img" />
-    <div class="cart-product-details">
-      <div class="cart-product-info">
-        <h3 class="cart-product-name">${products.nombre}</h3>
-        <button  type="button" class="remove-from-cart-btn" id="${products.id}"><i class="far fa-trash-alt"></i></button>
-      </div>
-      <div class="cart-product-price-qty">
-        <label>
-          <input data-precio="${products.precio}" type="number" min="0" value="1" class="cart-product-qty" />
-          unidades
-        </label>
-        <p class="cart-product-price">x $${precio}</p>
-      </div>
-    </div>
-  </article>`;
-};
-
+	const imagenURL = imagen.startsWith('http') ? imagen : `http://localhost:3001/${imagen.replace(/\\/g, '/')}`;
+	return `<article class="cart-product-added" data-id="${id}" data-qty="1" data-price="${precio}">
+	  <img src="${imagenURL}" alt="" class="cart-product-img" />
+	  <div class="cart-product-details">
+		<div class="cart-product-info">
+		  <h3 class="cart-product-name">${nombre}</h3>
+		  <button type="button" class="remove-from-cart-btn" id="${id}"><i class="far fa-trash-alt"></i></button>
+		</div>
+		<div class="cart-product-price-qty">
+		  <label>
+			<input data-precio="${precio}" type="number" min="1" value="1" class="cart-product-qty" />
+			unidades
+		  </label>
+		  <p class="cart-product-price">x $${precio}</p>
+		</div>
+	  </div>
+	</article>`;
+  };
+  
 
 function showProductOnCart(btnAddToCart) {
-    const id = btnAddToCart.getAttribute('id');
-    const name = btnAddToCart.closest('.product').getAttribute('data-name');
-    const price = btnAddToCart.closest('.product').getAttribute('data-price');
-
-    console.log("Agregando producto al carrito:", { id, name, price });
-
-    if (!id || !name || !price) {
-        console.error("Error: No se pudo obtener información del producto.");
-        return;
-    }
-
-    const plantilla = `
-        <tr class="cart-product-added" 
-            data-id="${id}" 
-            data-price="${price}">
-            <td>${name}</td>
-            <td>$${price}</td>
-            <td><input type="number" min="1" value="1" class="cart-product-qty"></td>
-            <td>$${price}</td>
-            <td><button class="remove-from-cart-btn" data-id="${id}">Eliminar</button></td>
-        </tr>`;
-    
-    carrito.insertAdjacentHTML('beforeend', plantilla);
-};
-
+	const productElement = btnAddToCart.closest('.product');
+	const id = productElement.dataset.id;
+	const name = productElement.dataset.name;
+	const price = productElement.dataset.price;
+	const image = productElement.dataset.image;
+  
+	console.log("Agregando producto al carrito:", { id, name, price, image });
+  
+	if (!id || !name || !price || !image) {
+	  console.error("Error: No se pudo obtener información del producto.");
+	  return;
+	}
+  
+	const plantilla = obtenerPlantillaProductoAgregado(id, name, price, image);
+	carrito.insertAdjacentHTML('beforeend', plantilla);
+  }
+  
 
 
 /*********************** 3-INICIALIZAR EVENTO MOSTRAR CARRITO ********************/
@@ -668,49 +661,12 @@ const checkoutForm = document.getElementById('checkoutForm');
   function mostrarMensajeCarritoVacio() {
     alert("El carrito está vacío. Por favor, agrega productos antes de continuar.");
 }
-  // Botón "Finalizar Compra"
-document.querySelector('.btn-finish-buy').addEventListener('click', async () => {  
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            redirectToLogin();
-            return;
-        }  
+ 
+ 
 
-        // Obtener datos del formulario
-        const nombre = document.getElementById('nameAndSurname').value;
-        const email = document.getElementById('email').value;
-        const telefono = document.getElementById('phone')?.value || "0000000000";
-        const dni = document.getElementById('dni')?.value || "00000000";
-        const paymentMethod = document.querySelector('input[name="payment"]:checked');
-        const formaPago = paymentMethod ? paymentMethod.value : 'cash-debit';
-        const necesitaEnvio = document.getElementById('needs-shipping').checked;
-        const tieneDescuento = document.getElementById('has-discount').checked;
-        const direccion = necesitaEnvio ? document.getElementById('address').value : null;
 
-        // Obtener productos del carrito
-        const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(products => ({
-            id: parseInt(products.dataset.id),
-            nombre: products.querySelector('.cart-product-name').textContent,
-            precio: parseFloat(products.dataset.price),
-            cantidad: parseInt(products.querySelector('.cart-product-qty').value)
-        }));
-		console.log("Productos detectados en el carrito:", productos);
 
-        if (productos.length === 0) {
-            throw new Error('El carrito está vacío');
-        }
-        
-        const total = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
-        
-        // Aquí iría el resto de tu lógica de compra...
-        // Por ejemplo, enviar los datos al servidor
-        
-    } catch (error) {
-        console.error('Error al finalizar compra:', error);
-        alert(error.message);
-    }
-});  // <-- El cierre correcto del addEventListener
+  
 
 //         // Crear objeto pedido
 //         const pedido = {
@@ -776,6 +732,30 @@ function resetOptionsPay(){
 	if (deliveryOption) deliveryOption.checked = false;
 	if (discountOption) discountOption.checked = false;
 }
+
+/*********************** EVENT LISTENERS PARA OPCIONES DE CHECKOUT ********************/
+document.addEventListener('DOMContentLoaded', () => {
+	const shippingOption = document.getElementById('needs-shipping');
+	const discountOption = document.getElementById('has-discount');
+
+	shippingOption?.addEventListener('change', () => {
+		const shippingInfo = document.querySelector('.checkout-shipping-info');
+		if (shippingOption.checked) {
+			shippingInfo.classList.remove('hidden');
+		} else {
+			shippingInfo.classList.add('hidden');
+		}
+	});
+
+	discountOption?.addEventListener('change', () => {
+		const discountInput = document.querySelector('.checkout-discount-code');
+		if (discountOption.checked) {
+			discountInput.classList.remove('hidden');
+		} else {
+			discountInput.classList.add('hidden');
+		}
+	});
+});
 const showCheckout = () => {
   show(menuCheckout);
   menuCheckout.setAttribute('aria-hidden', false)
@@ -795,17 +775,17 @@ btnOpenCheckout.onclick = () => {
 	calculateTotal();
 };
 
-btnFinishBuy.onclick = () => {
-	hiddeOverlay();
-	overlay.style.zIndex = '1';
-  bodyScroll();
-  resetCounterCart();
-	resetPriceToSubtotal();
-  hideAllProductsOnCart();
-  resetOptionsPay()
-	hiddeCheckout();
-	hiddeCart();
-};
+// btnFinishBuy.onclick = () => {
+// 	hiddeOverlay();
+// 	overlay.style.zIndex = '1';
+//   bodyScroll();
+//   resetCounterCart();
+// 	resetPriceToSubtotal();
+//   hideAllProductsOnCart();
+//   resetOptionsPay()
+// 	hiddeCheckout();
+// 	hiddeCart();
+// };
 
 btnCancelBuy.onclick = () => {
 	hiddeOverlay();
@@ -878,90 +858,112 @@ function calculateTotal() {
 }
 
 // Evento para finalizar compra
+// Evento para finalizar compra
 btnFinishBuy?.addEventListener('click', async (e) => {
-    e.preventDefault();
-    
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
+	e.preventDefault();
 
-        // Validar formulario
-        if (!checkoutForm.checkValidity()) {
-            checkoutForm.reportValidity();
-            return;
-        }
+	try {
+		const token = localStorage.getItem('token');
+		if (!token) {
+			redirectToLogin();
+			return;
+		}
 
-        // Obtener datos del formulario
-        const formData = {
-            cliente: {
-                nombre: document.getElementById('nameAndSurname').value,
-                email: document.getElementById('email').value,
-                telefono: document.getElementById('phone').value,
-                dni: document.getElementById('dni').value
-            },
-            formaPago: creditOption.checked ? 'credit' : 'cash-debit',
-            necesitaEnvio: deliveryOption.checked,
-            tieneDescuento: discountOption.checked,
-            direccion: deliveryOption.checked ? document.getElementById('address').value : null,
-            fechaEntrega: deliveryOption.checked ? 
-                new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : null
-        };
+		// Cliente
+		const cliente = {
+			nombre: document.getElementById('nameAndSurname').value.trim(),
+			email: document.getElementById('email').value.trim(),
+			telefono: document.getElementById('phone').value.trim(),
+			dni: document.getElementById('dni').value.trim()
+		};
 
-        // Obtener productos del carrito
-        const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(item => {
-			const qtyElement = item.querySelector('.cart-product-qty');
-			return {
-			  id: parseInt(item.dataset.id),
-			  nombre: item.querySelector('.cart-product-name')?.textContent || 'Producto sin nombre',
-			  precio: parseFloat(item.dataset.price) || 0,
-			  cantidad: qtyElement ? parseInt(qtyElement.value) || 1 : 1
-			};
-		  }).filter(product => !isNaN(product.id)); // Filtra productos inválidos
+		// Opciones
+		const formaPago = creditOption.checked ? 'credit' : 'cash-debit';
+		const necesitaEnvio = deliveryOption.checked;
+		const tieneDescuento = discountOption.checked;
+		const direccion = necesitaEnvio ? document.getElementById('address').value.trim() : null;
+		const fechaEntrega = necesitaEnvio
+			? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+			: null;
+
+		// Productos del carrito
+		const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(item => {
+			const nombre = item.querySelector('.cart-product-name')?.textContent.trim() || '';
+			const cantidad = parseInt(item.querySelector('.cart-product-qty')?.value) || 1;
+			const precio = parseFloat(item.dataset.price) || 0;
+			const id = parseInt(item.dataset.id);
+
+			return { id, nombre, cantidad, precio };
+		}).filter(p => !isNaN(p.id));
+
+
+
+		const formData = {
+			nombre: document.querySelector('#nombre').value,
+			email: document.querySelector('#email').value,
+			telefono: document.querySelector('#telefono').value,
+			dni: document.querySelector('#dni').value,
+			direccion: document.querySelector('#direccion')?.value,
+			fechaEntrega: document.querySelector('#fechaEntrega')?.value,
+			formaPago: document.querySelector('input[name="pago"]:checked')?.value,
+			necesitaEnvio: document.querySelector('#envio')?.checked || false,
+			tieneDescuento: document.querySelector('#descuento')?.checked || false,
+		  };
 		  
-		  if (productos.length === 0) {
-			mostrarMensajeCarritoVacio(); // Función que actualiza la UI
-			throw new Error('No hay productos válidos en el carrito');
-		  }
 
-        // Calcular total
-        const total = calculateTotal();
+		//const total = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+		const subtotal = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+        const descuento = formData.tieneDescuento ? subtotal * 0.1 : 0; // Ejemplo de descuento
+        const total = subtotal - descuento;
 
-        // Enviar pedido al backend
-        const response = await fetch('http://localhost:3001/api/pedidos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                ...formData,
-                productos,
-                total: total
-            })
-        });
+		// Enviar al backend
+		const response = await fetch('http://localhost:3001/api/pedidos', {
+			method: 'POST',
+			headers: {
+			  'Content-Type': 'application/json',
+			  'Authorization': `Bearer ${token}`
+			},
+			body: JSON.stringify({
+			  ...formData,
+			  productos,
+			  subtotal,
+			  descuento,
+			  total
+			})
+		  });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Error al procesar el pedido');
-        }
+		const result = await response.json();
+		console.log('Respuesta del servidor:', result);
 
-        // Limpiar carrito y cerrar checkout
-        document.querySelector('.cart-products-added').innerHTML = '';
-        cartSubtotalValue.textContent = '0';
-        cartTotalValue.textContent = '0';
-        menuCheckout.classList.add('is-hidden');
-        document.body.classList.remove('no-scroll');
-        
-        alert('¡Pedido realizado con éxito!');
-    } catch (error) {
-        console.error('Error:', error);
-        alert(`Error: ${error.message}`);
-    }
+		if (!response.ok) throw new Error(result.message || 'Error al realizar el pedido');
+
+		// Reset general
+		document.querySelector('.cart-products-added').innerHTML = '';
+		cartSubtotalValue.textContent = '0';
+		cartTotalValue.textContent = '0';
+		menuCheckout.classList.add('is-hidden');
+		document.body.classList.remove('no-scroll');
+
+		hiddeOverlay();
+		overlay.style.zIndex = '1';
+		bodyScroll();
+		resetCounterCart();
+		resetPriceToSubtotal();
+		hideAllProductsOnCart();
+		resetOptionsPay();
+		hiddeCheckout();
+		hiddeCart();
+
+		alert("¡Compra finalizada con éxito!");
+
+	} catch (error) {
+		console.error('Error al finalizar compra:', error);
+		alert(error.message);
+	}
 });
 
+
+		  
 // Inicialización de eventos
 document.addEventListener('DOMContentLoaded', () => {
     // Eventos para actualizar el total cuando cambian las opciones

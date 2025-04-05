@@ -30,7 +30,8 @@ const app = express();
 
 const corsOptions = {
   origin:[  'http://127.0.0.1:5500', 'http://localhost:3001'], // Permite el origen de tu frontend
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Agrega PATCH aquí
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  credentials: true, // Agrega PATCH aquí
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
@@ -228,6 +229,8 @@ app.post('/api/pedidos', [
     productos, 
     formaPago, 
     total,
+    dexcuento,
+    subtotal,
     necesitaEnvio = false,
     tieneDescuento = false
   } = req.body;
@@ -246,8 +249,8 @@ await client.query(
   `INSERT INTO pedidos (
     id, cliente_nombre, cliente_email, cliente_telefono, cliente_dni,
     direccion, fecha_entrega, forma_pago, necesita_envio, tiene_descuento,
-    total, productos, usuario_id
-  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+    total,subtotal, productos, usuario_id
+  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,$14)`,
   [
     pedidoId,
     cliente.nombre,
@@ -260,6 +263,7 @@ await client.query(
     necesitaEnvio,
     tieneDescuento,
     total,
+    subtotal,
     JSON.stringify(productos),
     req.usuario.id
   ]
