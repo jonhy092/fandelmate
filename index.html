@@ -274,16 +274,14 @@
       
          <!-- INICIA BOTON INICIO DE SESION-->
          <div>
-            <button type="button"
-                    class="btn-login in-line button button-simple-empty"
-                    aria-label="Redirigir al inicio de sesión"
-                    onclick="redirectToLogin()">
+            <a href="usuario.html" target="_blank"
+               class="btn-login in-line button button-simple-empty login-link"
+               aria-label="Redirigir al panel de administrador">
               <i class="fas fa-sign-in-alt login-icon" aria-hidden="true"></i>
-              <div class="login-text">
-                <a href="usuario.html" target="_blank" class="login-link" aria-label="Redirigir al inicio de sesión">Administrador</a>
-              </div>
-            </button>
+              <div class="login-text">Administrador</div>
+            </a>
           </div>
+          
           <!-- FIN DEL BOTON INICIO SESION-->
     <footer class="footer-main in-grid theme-sky-dark">
         <div class="logo-container in-line">
@@ -376,7 +374,7 @@
                         <div class="checkout-personal-info-inputs">
                             <label for="nameAndSurname">
                                 Nombre y apellido *
-                                <input type="text" placeholder="Ej: Juan Pérez"  id="nameAndSurname" />
+                                <input type="text" placeholder="Ej: Juan Pérez"  id="nombre" />
                             </label>
                             <label for="email">
                                 Email *
@@ -407,11 +405,11 @@
                             Tarjeta Crédito (10% recargo)
                         </label>
                         <label>
-                            <input type="checkbox" id="needs-shipping" name="needsShipping">
+                            <input type="checkbox" id="envio" name="needsShipping">
                             Necesito envío (+$50)
                         </label>
                         <label>
-                            <input type="checkbox" id="has-discount" name="hasDiscount">
+                            <input type="checkbox" id="descuento" name="hasDiscount">
                             Tengo descuento (10%)
                         </label>
                     </div>

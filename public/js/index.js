@@ -411,11 +411,43 @@ addPriceToSubtotal = (btnAddToCart) => {
 	let subtotal = productAdded.dataset.price;
 	addSubtotal(subtotal);
 };
+//SUMAR CANTIDAD DEL MISMO PRODUCTO//
+function actualizarSubtotalGlobal() {
+	const productosEnCarrito = document.querySelectorAll('.cart-product-added');
+	let nuevoSubtotal = 0;
+  
+	productosEnCarrito.forEach(producto => {
+	  const precioUnitario = parseFloat(producto.dataset.price);
+	  const cantidad = parseInt(producto.querySelector('.cart-product-qty').value);
+	  nuevoSubtotal += precioUnitario * cantidad;
+	});
+  
+	subtotalProductsAdded = nuevoSubtotal;
+  
+	cartSubtotalOutput.forEach(c => {
+	  c.innerText = subtotalProductsAdded.toFixed(2);
+	});
+  }
+  
+  function escucharCambiosDeCantidad() {
+	const inputsCantidad = document.querySelectorAll('.cart-product-qty');
+  
+	inputsCantidad.forEach(input => {
+	  input.addEventListener('change', () => {
+		const cantidad = parseInt(input.value);
+		if (cantidad < 1) {
+		  input.value = 1;
+		}
+		actualizarSubtotalGlobal();
+	  });
+	});
+  }
+  // Escuchar cambios de cantidad al cargar la página  
 
 const obtenerPlantillaProductoAgregado = (id, nombre, precio, imagen) => {
 	const imagenURL = imagen.startsWith('http') ? imagen : `http://localhost:3001/${imagen.replace(/\\/g, '/')}`;
 	return `<article class="cart-product-added" data-id="${id}" data-qty="1" data-price="${precio}">
-	  <img src="${imagenURL}" alt="" class="cart-product-img" />
+	  <img src="${imagen}" alt="" class="cart-product-img" />
 	  <div class="cart-product-details">
 		<div class="cart-product-info">
 		  <h3 class="cart-product-name">${nombre}</h3>
@@ -449,6 +481,9 @@ function showProductOnCart(btnAddToCart) {
   
 	const plantilla = obtenerPlantillaProductoAgregado(id, name, price, image);
 	carrito.insertAdjacentHTML('beforeend', plantilla);
+	escucharCambiosDeCantidad();
+    actualizarSubtotalGlobal();
+
   }
   
 
@@ -801,8 +836,8 @@ const allPayOptions = document.querySelectorAll('.pay-option');
 // Elementos de opciones de pago (usando IDs consistentes con el HTML)
 const cashOption = document.getElementById('payment-cash');
 const creditOption = document.getElementById('payment-credit');
-const deliveryOption = document.getElementById('needs-shipping');
-const discountOption = document.getElementById('has-discount');
+const deliveryOption = document.getElementById('envio');
+const discountOption = document.getElementById('descuento');
 
 
 // Elementos de precios
@@ -871,20 +906,32 @@ btnFinishBuy?.addEventListener('click', async (e) => {
 
 		// Cliente
 		const cliente = {
-			nombre: document.getElementById('nameAndSurname').value.trim(),
+			nombre: document.getElementById('nombre').value.trim(),
 			email: document.getElementById('email').value.trim(),
 			telefono: document.getElementById('phone').value.trim(),
 			dni: document.getElementById('dni').value.trim()
 		};
 
 		// Opciones
-		const formaPago = creditOption.checked ? 'credit' : 'cash-debit';
+		const deliveryOption = document.querySelector('#envio');
+        const discountOption = document.querySelector('#descuento');
+		const formaPago = document.querySelector('input[name="payment"]:checked')?.value || 'cash-debit';
 		const necesitaEnvio = deliveryOption.checked;
 		const tieneDescuento = discountOption.checked;
 		const direccion = necesitaEnvio ? document.getElementById('address').value.trim() : null;
 		const fechaEntrega = necesitaEnvio
 			? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 			: null;
+
+			// ENVIO//
+			const envio = necesitaEnvio
+  ? {
+      direccion: document.querySelector('#address')?.value.trim(),
+      fechaEntrega: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    }
+  : undefined; // importante: NO null, sino undefined (no se envía)
+
+
 
 		// Productos del carrito
 		const productos = Array.from(document.querySelectorAll('.cart-product-added')).map(item => {
@@ -899,17 +946,23 @@ btnFinishBuy?.addEventListener('click', async (e) => {
 
 
 		const formData = {
-			nombre: document.querySelector('#nombre').value,
-			email: document.querySelector('#email').value,
-			telefono: document.querySelector('#telefono').value,
-			dni: document.querySelector('#dni').value,
-			direccion: document.querySelector('#direccion')?.value,
-			fechaEntrega: document.querySelector('#fechaEntrega')?.value,
-			formaPago: document.querySelector('input[name="pago"]:checked')?.value,
-			necesitaEnvio: document.querySelector('#envio')?.checked || false,
-			tieneDescuento: document.querySelector('#descuento')?.checked || false,
+			cliente: {
+			  nombre: document.querySelector('#nombre')?.value.trim(),
+			  email: document.querySelector('#email')?.value.trim(),
+			  telefono: document.querySelector('#phone')?.value.trim(),
+			  dni: document.querySelector('#dni')?.value.trim()
+			},
+			envio: {
+			  direccion: necesitaEnvio ? document.querySelector('#address')?.value.trim() : null,
+			  fechaEntrega: necesitaEnvio ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : null
+			},
+			formaPago,
+			necesitaEnvio,
+			tieneDescuento
 		  };
 		  
+		 // body('descuento').optional().isFloat({ min: 0 })
+
 
 		//const total = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
 		const subtotal = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
@@ -924,13 +977,19 @@ btnFinishBuy?.addEventListener('click', async (e) => {
 			  'Authorization': `Bearer ${token}`
 			},
 			body: JSON.stringify({
-			  ...formData,
-			  productos,
-			  subtotal,
-			  descuento,
-			  total
+				cliente,
+				envio, // si undefined, no se incluye
+				formaPago,
+				necesitaEnvio,
+				tieneDescuento,
+				productos,
+				subtotal,
+				descuento,
+				total
+			  })
 			})
-		  });
+			  
+		  
 
 		const result = await response.json();
 		console.log('Respuesta del servidor:', result);
@@ -1160,12 +1219,12 @@ function listenEventsOnCart() {
 
 	botonesEliminar.forEach(boton => {
 		boton.addEventListener('click', () => {
-			const fila = boton.closest('tr');
-			if (fila) {
-				fila.remove(); // Elimina la fila del carrito
+			const item = boton.closest('.cart-product-added'); // <--- CAMBIO
+			if (item) {
+				item.remove(); // Elimina el producto del carrito
 
 				// Actualiza subtotal y contador
-				updateCartSubtotal();
+				actualizarSubtotalGlobal(); // Usá tu función global aquí
 				updateCartCounter();
 			}
 		});
@@ -1173,21 +1232,25 @@ function listenEventsOnCart() {
 
 	inputsCantidad.forEach(input => {
 		input.addEventListener('input', () => {
-			const fila = input.closest('tr');
-			if (fila) {
-				const price = parseFloat(fila.dataset.price);
+			const item = input.closest('.cart-product-added'); // <--- CAMBIO
+			if (item) {
+				const price = parseFloat(input.dataset.precio);
 				const cantidad = parseInt(input.value) || 1;
 
-				// Actualiza el subtotal de esa fila
-				fila.querySelectorAll('td')[3].textContent = `$${(price * cantidad).toFixed(2)}`;
+				// Actualiza precio visual
+				const precioTexto = item.querySelector('.cart-product-price');
+				if (precioTexto) {
+					precioTexto.textContent = `x $${(price * cantidad).toFixed(2)}`;
+				}
 
-				// Actualiza subtotal general y contador
-				updateCartSubtotal();
+				// Actualiza subtotal global
+				actualizarSubtotalGlobal();
 				updateCartCounter();
 			}
 		});
 	});
 }
+
 
 
 // FUNCIÓN PARA AGREGAR EVENTOS A LOS BOTONES "AGREGAR AL CARRITO"

@@ -1,76 +1,43 @@
+import { io } from "https://cdn.socket.io/4.7.2/socket.io.esm.min.js";
+
 document.querySelector(".btn-finish-buy").addEventListener("click", async () => {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('Usuario no autenticado');
-        }
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Usuario no autenticado');
 
-        const nombre = document.getElementById("nameAndSurname").value;
-        const email = document.getElementById("email").value;
-        const telefono = document.getElementById("phone").value || "123456789";
-        const dni = document.getElementById("dni").value || "12345678";
-        const direccion = document.getElementById("address").value || "Av. Ejemplo 123";
-        const fechaEntrega = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        const formaPago = document.querySelector('input[name="payment"]:checked').value;
-        const necesitaEnvio = document.getElementById("needsShipping").checked;
+    // ... todos tus datos del pedido ...
 
-        const productos = Array.from(document.querySelectorAll(".cart-products-added tr")).map(row => ({
-            id: parseInt(row.dataset.productId),
-            nombre: row.children[0].innerText,
-            precio: parseFloat(row.children[1].innerText.replace("$", "")),
-            cantidad: parseInt(row.children[2].querySelector("input").value),
-            subtotal: parseFloat(row.children[3].innerText.replace("$", ""))
-        }));
+    const response = await fetch("http://localhost:3001/api/pedidos", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(pedido)
+    });
 
-        const total = productos.reduce((acc, p) => acc + p.subtotal, 0);
+    if (!response.ok) throw new Error('Error al procesar el pedido');
 
-        const pedido = {
-            cliente: { 
-                nombre, 
-                email, 
-                telefono, 
-                dni 
-            },
-            envio: { 
-                direccion, 
-                fechaEntrega 
-            },
-            productos,
-            formaPago,
-            total,
-            necesitaEnvio,
-            tieneDescuento: false
-        };
+    const data = await response.json();
+    console.log("Pedido enviado:", data);
 
-        // Enviar datos al backend
-        const response = await fetch("http://localhost:3001/api/pedidos", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(pedido)
-        });
+    // ✅ ENVIAR EVENTO AL ADMIN VÍA SOCKET.IO
+    const socket = io("http://localhost:3001", {
+      auth: {
+        token
+      }
+    });
 
-        if (!response.ok) {
-            throw new Error('Error al procesar el pedido');
-        }
+    socket.emit("nuevoPedido", data.pedido); // este evento lo debería escuchar el admin
 
-        const data = await response.json();
-        console.log("Pedido enviado:", data);
-        
-        // Notificar en tiempo real (opcional)
-        const socket = io("http://localhost:3001", {
-            auth: { token }
-        });
-        socket.emit("nuevoPedido", data.pedido);
-        
-        // Redirigir o mostrar mensaje de éxito
-        alert("Pedido realizado con éxito!");
-        window.location.href = "gracias.html";
+    // ✅ Darle tiempo a emitir antes de redirigir
+    setTimeout(() => {
+      alert("Pedido realizado con éxito!");
+      window.location.href = "gracias.html";
+    }, 500);
 
-    } catch (error) {
-        console.error("Error al enviar el pedido:", error);
-        alert(`Error: ${error.message}`);
-    }
+  } catch (error) {
+    console.error("Error al enviar el pedido:", error);
+    alert(`Error: ${error.message}`);
+  }
 });

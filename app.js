@@ -31,7 +31,7 @@ const app = express();
 const corsOptions = {
   origin:[  'http://127.0.0.1:5500', 'http://localhost:3001'], // Permite el origen de tu frontend
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  credentials: true, // Agrega PATCH aquí
+  credentials: true, 
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
@@ -87,8 +87,9 @@ const PORT = process.env.PORT || 3001;
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
-    methods: ["GET", "POST"]
+    origin: process.env.FRONTEND_URL || ['http://localhost:3001', 'http://127.0.0.1:5500'],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -113,8 +114,13 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   console.log(`Usuario conectado: ${socket.user.id}`);
   
+  socket.on('joinAdmin', () => {
+    socket.join('admin');
+    console.log("👑 Admin unido a sala 'admin'");
+  });
+
   socket.on('disconnect', () => {
-    console.log(`Usuario desconectado: ${socket.user.id}`);
+    console.log(`❌ Usuario desconectado: ${socket.user.id}`);
   });
 });
 
@@ -229,7 +235,7 @@ app.post('/api/pedidos', [
     productos, 
     formaPago, 
     total,
-    dexcuento,
+    descuento,
     subtotal,
     necesitaEnvio = false,
     tieneDescuento = false
@@ -249,8 +255,8 @@ await client.query(
   `INSERT INTO pedidos (
     id, cliente_nombre, cliente_email, cliente_telefono, cliente_dni,
     direccion, fecha_entrega, forma_pago, necesita_envio, tiene_descuento,
-    total,subtotal, productos, usuario_id
-  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,$14)`,
+    total, subtotal, descuento, productos, usuario_id
+  ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
   [
     pedidoId,
     cliente.nombre,
@@ -264,10 +270,12 @@ await client.query(
     tieneDescuento,
     total,
     subtotal,
+    descuento, // 🟢
     JSON.stringify(productos),
     req.usuario.id
   ]
 );
+
 
 // 3. Actualizar stock
 for (const producto of productos) {

@@ -1,5 +1,5 @@
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-import { jsPDF } from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+//import { jsPDF } from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
 
 class PedidosManager {
   constructor() {
@@ -158,7 +158,7 @@ class PedidosManager {
     }
     
     pedidos.forEach(pedido => {
-      const productos = JSON.parse(pedido.productos);
+      const productos = pedido.productos;
       const productosStr = productos.map(p => 
         `${p.nombre} (${p.cantidad} x $${p.precio.toFixed(2)})`
       ).join('<br>');
@@ -169,7 +169,9 @@ class PedidosManager {
         <td>${pedido.cliente_nombre}</td>
         <td>${pedido.cliente_email}</td>
         <td>${productosStr}</td>
-        <td>$${pedido.total.toFixed(2)}</td>
+       <td>$${pedido.total && !isNaN(pedido.total) ? Number(pedido.total).toFixed(2) : '0.00'}</td>
+
+
         <td>
           ${pedido.forma_pago === 'cash-debit' ? 'Efectivo/Débito' : 'Tarjeta Crédito'}<br>
           ${pedido.tiene_descuento ? 'Con descuento' : 'Sin descuento'}
