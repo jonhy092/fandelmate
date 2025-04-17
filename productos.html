@@ -80,26 +80,57 @@
         }
         
         /* Tabla de pedidos */
-        .tabla-pedidos {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
+        .tabla-pedidos-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tabla-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 400px; /* opcional */
+  overflow-y: auto;  /* opcional */
 }
 
-.tabla-pedidos th, .tabla-pedidos td {
-  text-align: center;
-  vertical-align: middle;
+
+.tabla-header,
+.fila-pedido {
+  display: grid;
+  grid-template-columns: 8% 12% 18% 22% 10% 10% 10% 10%;
+  gap: 5px;
   padding: 10px;
-  border: 1px solid #ddd;
-  word-break: break-word;
+  align-items: center;
+  box-sizing: border-box;
 }
 
-.tabla-pedidos th:nth-child(2),
-.tabla-pedidos td:nth-child(2),
-.tabla-pedidos th:nth-child(3),
-.tabla-pedidos td:nth-child(3) {
-  text-align: left;
+.tabla-header {
+  font-weight: bold;
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #ccc;
 }
+
+.fila-pedido {
+  border-bottom: 1px solid #ddd;
+}
+
+.fila-pedido > div,
+.tabla-header > div {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  box-sizing: border-box;
+}
+
+.fila-pedido button {
+  max-width: 100%;
+  font-size: 12px;
+  padding: 4px 6px;
+}
+
+
+
+
 
 
     </style>
@@ -172,24 +203,20 @@
                     </div>
                     
                     <!-- Tabla de pedidos -->
-                    <div class="table-pedidos">
-                        <table class="table-pedidos">
-                            <thead>
-                                <tr>
-                                  <th>ID</th>
-                                  <th>Cliente</th>
-                                  <th>Email</th>
-                                  <th>Productos</th>
-                                  <th>Total</th>
-                                  <th>Pago</th>
-                                  <th>Envío</th>
-                                  <th>Acciones</th>
-                                </tr>
-                              </thead>
-                              
-                            <tbody id="tablaPedidos"></tbody>
-                        </table>
-                    </div>
+                    <div class="tabla-pedidos-grid">
+                        <div class="tabla-header">
+                          <div>ID</div>
+                          <div>Cliente</div>
+                          <div>Email</div>
+                          <div>Productos</div>
+                          <div>Total</div>
+                          <div>Pago</div>
+                          <div>Envío</div>
+                          <div>Acciones</div>
+                        </div>
+                        <div id="tablaPedidos" class="tabla-body"></div>
+                      </div>
+                      
                     
                     <!-- Paginación -->
                     <nav aria-label="Paginación de pedidos">

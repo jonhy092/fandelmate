@@ -892,7 +892,7 @@ function calculateTotal() {
     return total;
 }
 
-// Evento para finalizar compra
+
 // Evento para finalizar compra
 btnFinishBuy?.addEventListener('click', async (e) => {
 	e.preventDefault();
@@ -909,7 +909,8 @@ btnFinishBuy?.addEventListener('click', async (e) => {
 			nombre: document.getElementById('nombre').value.trim(),
 			email: document.getElementById('email').value.trim(),
 			telefono: document.getElementById('phone').value.trim(),
-			dni: document.getElementById('dni').value.trim()
+			dni: document.getElementById('dni').value.trim(),
+			direccion: document.getElementById('address').value.trim()
 		};
 
 		// Opciones
@@ -950,7 +951,8 @@ btnFinishBuy?.addEventListener('click', async (e) => {
 			  nombre: document.querySelector('#nombre')?.value.trim(),
 			  email: document.querySelector('#email')?.value.trim(),
 			  telefono: document.querySelector('#phone')?.value.trim(),
-			  dni: document.querySelector('#dni')?.value.trim()
+			  dni: document.querySelector('#dni')?.value.trim(),
+			  direccion: document.querySelector('#address')?.value.trim(),
 			},
 			envio: {
 			  direccion: necesitaEnvio ? document.querySelector('#address')?.value.trim() : null,

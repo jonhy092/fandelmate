@@ -149,38 +149,38 @@ class PedidosManager {
 
   mostrarPedidos(pedidos) {
     this.elements.tablaPedidos.innerHTML = '';
-    
+  
     if (pedidos.length === 0) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = '<td colspan="8" class="text-center">No hay pedidos</td>';
-      this.elements.tablaPedidos.appendChild(tr);
+      const sinPedidos = document.createElement('div');
+      sinPedidos.className = "fila-pedido";
+      sinPedidos.innerHTML = '<div style="grid-column: span 8; text-align:center;">No hay pedidos</div>';
+      this.elements.tablaPedidos.appendChild(sinPedidos);
       return;
     }
-    
+  
     pedidos.forEach(pedido => {
       const productos = pedido.productos;
       const productosStr = productos.map(p => 
         `${p.nombre} (${p.cantidad} x $${p.precio.toFixed(2)})`
       ).join('<br>');
-      
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${pedido.id.substring(0, 8)}</td>
-        <td>${pedido.cliente_nombre}</td>
-        <td>${pedido.cliente_email}</td>
-        <td>${productosStr}</td>
-       <td>$${pedido.total && !isNaN(pedido.total) ? Number(pedido.total).toFixed(2) : '0.00'}</td>
-
-
-        <td>
+  
+      const fila = document.createElement('div');
+      fila.className = 'fila-pedido';
+      fila.innerHTML = `
+        <div>${pedido.id.substring(0, 8)}</div>
+        <div>${pedido.cliente_nombre}</div>
+        <div>${pedido.cliente_email}</div>
+        <div>${productosStr}</div>
+        <div>$${pedido.total && !isNaN(pedido.total) ? Number(pedido.total).toFixed(2) : '0.00'}</div>
+        <div>
           ${pedido.forma_pago === 'cash-debit' ? 'Efectivo/Débito' : 'Tarjeta Crédito'}<br>
           ${pedido.tiene_descuento ? 'Con descuento' : 'Sin descuento'}
-        </td>
-        <td>
+        </div>
+        <div>
           ${pedido.necesita_envio ? 'Sí' : 'No'}<br>
           ${pedido.direccion || ''}
-        </td>
-        <td>
+        </div>
+        <div>
           <button class="btn btn-sm ${pedido.estado === 'pendiente' ? 'btn-success' : 'btn-secondary'} 
                   btnProcesar" data-id="${pedido.id}" 
                   ${pedido.estado !== 'pendiente' ? 'disabled' : ''}>
@@ -189,11 +189,12 @@ class PedidosManager {
           <button class="btn btn-sm btn-primary btnVer" data-id="${pedido.id}">
             <i class="bi bi-eye"></i> Ver
           </button>
-        </td>
+        </div>
       `;
-      this.elements.tablaPedidos.appendChild(tr);
+      this.elements.tablaPedidos.appendChild(fila);
     });
   }
+  
 
   mostrarPaginacion({ total, pagina, totalPaginas, limite }) {
     this.elements.paginacion.innerHTML = '';
