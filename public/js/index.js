@@ -659,12 +659,6 @@ const btnCancelBuy = document.querySelector('.btn-cancel-buy');
 const menuCheckout = document.querySelector('.menu-checkout');
 const checkoutForm = document.getElementById('checkoutForm');
 
-
-
-
-
-
-
 //EVENTO QUE AL CLICKEAR FINALIZAR COMPRA, SE CARGA EL MODAL DE COMPRA FINALIZADA Y MANEJA EL STOCK//
 // Ejemplo de productos en el carrito
 //document.querySelector('.btn-finish-buy').addEventListener('click', async () => {
@@ -998,6 +992,22 @@ btnFinishBuy?.addEventListener('click', async (e) => {
 
 		if (!response.ok) throw new Error(result.message || 'Error al realizar el pedido');
 
+		// Actualizar stock
+await fetch('http://localhost:3001/cart/checkout', {
+	method: 'POST',
+	headers: {
+	  'Content-Type': 'application/json',
+	  'Authorization': `Bearer ${token}`
+	},
+	body: JSON.stringify({
+	  products: productos.map(p => ({
+		id: p.id,
+		quantity: p.cantidad
+	  }))
+	})
+  });
+  
+
 		// Reset general
 		document.querySelector('.cart-products-added').innerHTML = '';
 		cartSubtotalValue.textContent = '0';
@@ -1174,25 +1184,29 @@ async function insertarProductos() {
 }
 
 function generarProductoHTML(product) {
+	const isOutOfStock = product.quantity === 0;
+	const isLowStock = product.quantity > 0 && product.quantity < 5;
+  
 	return `
 	  <article class="product" 
-			   data-id="${product.id}" 
-			   data-name="${product.name}" 
-			   data-category="${product.category_id}" 
-			   data-price="${product.price}" 
-			   data-image="${product.image_url}">
+		   data-id="${product.id}" 
+		   data-name="${product.name}" 
+		   data-category="${product.category_id}" 
+		   data-price="${product.price}" 
+		   data-image="${product.image_url}">
 		<div class="product-img-container in-line">
 		  <img src="${product.image_url}" alt="${product.name}" class="product-img" />
 		</div>
 		<div class="product-content in-stack">
 		  <h2 class="product-name">${product.name}</h2>
 		  <p class="product-price" aria-label="Precio en pesos argentinos:">$ ${product.price}</p>
-		  ${product.quantity < 5 ? '<p class="low-stock-warning">¡Últimas unidades!</p>' : ''}
+		  ${isLowStock ? '<p class="low-stock-warning">¡Últimas unidades!</p>' : ''}
+		  ${isOutOfStock ? '<p class="out-of-stock-warning">Sin stock</p>' : ''}
 		  <div class="product-description is-hidden">
 			${product.description || 'Sin descripción disponible.'}
 		  </div>
 		  <div>
-			<button type="button" class="button button-simple-solid button-add-to-cart" id="${product.id}">
+			<button type="button" class="button button-simple-solid button-add-to-cart" id="${product.id}" ${isOutOfStock ? 'disabled' : ''}>
 			  Agregar al carrito
 			</button>
 		  </div>
@@ -1201,10 +1215,6 @@ function generarProductoHTML(product) {
 	`;
   }
   
-  
-
-document.addEventListener('DOMContentLoaded', insertarProductos);
-
 
 // INSERTA LOS PRODUCTOS EN EL CONTENEDOR
 //function insertarProductos() {

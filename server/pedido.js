@@ -1,5 +1,7 @@
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 //import { jsPDF } from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+const { jsPDF } = window.jspdf;
+
 
 class PedidosManager {
   constructor() {
@@ -69,14 +71,17 @@ class PedidosManager {
       if (e.target.closest('.btnProcesar')) {
         this.procesarPedido(e);
       }
-      if (e.target.closest('.btnVer')) {
-        this.generarPDF(e);
+      if (e.target.closest('.btnVerDetalles')) {
+        this.verDetallesPedido(e); // nueva función para mostrar detalles
+      }
+      if (e.target.closest('.btnDescargarPDF')) {
+        this.generarPDF(e); // ya existente para descargar pdf
       }
       if (e.target.closest('.page-link')) {
         this.cambiarPagina(e);
       }
     });
-  }
+  }    
 
   async cargarPedidos(pagina = 1, limite = 10) {
     this.mostrarLoading(true);
@@ -93,6 +98,7 @@ class PedidosManager {
       }
 
       const { data, paginacion } = await response.json();
+      this.pedidos = data;
       
       this.pedidosPendientes = data.filter(p => p.estado === 'pendiente').length;
       this.actualizarBadge();
@@ -167,33 +173,63 @@ class PedidosManager {
       const fila = document.createElement('div');
       fila.className = 'fila-pedido';
       fila.innerHTML = `
-        <div>${pedido.id.substring(0, 8)}</div>
-        <div>${pedido.cliente_nombre}</div>
-        <div>${pedido.cliente_email}</div>
-        <div>${productosStr}</div>
-        <div>$${pedido.total && !isNaN(pedido.total) ? Number(pedido.total).toFixed(2) : '0.00'}</div>
-        <div>
-          ${pedido.forma_pago === 'cash-debit' ? 'Efectivo/Débito' : 'Tarjeta Crédito'}<br>
-          ${pedido.tiene_descuento ? 'Con descuento' : 'Sin descuento'}
-        </div>
-        <div>
-          ${pedido.necesita_envio ? 'Sí' : 'No'}<br>
-          ${pedido.direccion || ''}
-        </div>
-        <div>
-          <button class="btn btn-sm ${pedido.estado === 'pendiente' ? 'btn-success' : 'btn-secondary'} 
-                  btnProcesar" data-id="${pedido.id}" 
-                  ${pedido.estado !== 'pendiente' ? 'disabled' : ''}>
-            ${pedido.estado === 'pendiente' ? '<i class="bi bi-check-lg"></i> Procesar' : 'Procesado'}
-          </button>
-          <button class="btn btn-sm btn-primary btnVer" data-id="${pedido.id}">
-            <i class="bi bi-eye"></i> Ver
-          </button>
-        </div>
-      `;
+      <div>${pedido.id.substring(0, 8)}</div>
+      <div>${pedido.cliente_nombre}</div>
+      <div>${pedido.cliente_email}</div>
+      <div>${productosStr}</div>
+      <div>$${pedido.total && !isNaN(pedido.total) ? Number(pedido.total).toFixed(2) : '0.00'}</div>
+      <div>
+        ${pedido.forma_pago === 'cash-debit' ? 'Efectivo/Débito' : 'Tarjeta Crédito'}<br>
+        ${pedido.tiene_descuento ? 'Con descuento' : 'Sin descuento'}
+      </div>
+      <div>
+        ${pedido.necesita_envio ? 'Sí' : 'No'}<br>
+        ${pedido.direccion || ''}
+      </div>
+      <div>
+        <button class="btn btn-sm ${pedido.estado === 'pendiente' ? 'btn-success' : 'btn-secondary'} 
+                btnProcesar" data-id="${pedido.id}" 
+                ${pedido.estado !== 'pendiente' ? 'disabled' : ''}>
+          ${pedido.estado === 'pendiente' ? '<i class="bi bi-check-lg"></i> Procesar' : 'Procesado'}
+        </button>
+        <button class="btn btn-sm btn-primary btnVerDetalles" data-id="${pedido.id}">
+          <i class="bi bi-eye"></i> Ver
+        </button>
+        <button class="btn btn-sm btn-info btnDescargarPDF" data-id="${pedido.id}">
+          <i class="bi bi-file-earmark-pdf"></i> PDF
+        </button>
+      </div>
+    `;
+    
       this.elements.tablaPedidos.appendChild(fila);
     });
   }
+  
+
+
+  verDetallesPedido = (e) => {
+    const btn = e.target.closest('.btnVerDetalles');
+    const idPedido = btn.dataset.id;
+
+    const pedido = this.pedidos.find(p => p.id === idPedido);
+
+    if (pedido) {
+        const total = (parseFloat(pedido.total) || 0).toFixed(2); // Aseguramos que total sea un número
+
+        alert(`
+            Pedido: ${pedido.id}
+            Cliente: ${pedido.cliente_nombre}
+            Email: ${pedido.cliente_email}
+            Productos: ${pedido.productos.map(p => `${p.nombre} (${p.cantidad}x)`).join(', ')}
+            Total: $${total}
+            Forma de pago: ${pedido.forma_pago}
+            Envio: ${pedido.necesita_envio ? 'Sí' : 'No'}
+            ${pedido.direccion ? `Dirección: ${pedido.direccion}` : ''}
+        `);
+    }
+}
+
+  
   
 
   mostrarPaginacion({ total, pagina, totalPaginas, limite }) {
@@ -270,15 +306,14 @@ class PedidosManager {
     }
   }
 
-  generarPDF(event) {
-    const btn = event.target.closest('.btnVer');
-    const pedidoId = btn.dataset.id;
-    
-    // Aquí implementarías la generación del PDF
-    // usando jsPDF como en tu ejemplo original
-    console.log('Generando PDF para pedido:', pedidoId);
+  generarPDF = (e) => {
+    const btn = e.target.closest('.btnDescargarPDF');
+    if (!btn) return; // ⛔ Salgo si no se encontró el botón
+    const idPedido = btn.dataset.id;
+  
+    // Tu código para generar el PDF sigue acá...
   }
-
+  
   cambiarPagina(event) {
     event.preventDefault();
     const pagina = parseInt(event.target.dataset.page);
