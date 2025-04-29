@@ -546,6 +546,10 @@ button {
 	padding: 20px 10px;
 	transition: all 2s;
 	z-index: 5;
+	max-height: 90vh; /* o la altura que necesites */
+  overflow-y: auto;
+  /* Opcionalmente también puedes agregar: */
+  padding-bottom: 100px; /* para que no se tapen los botones */
 }
 .checkout-container {
 	width: 100%;

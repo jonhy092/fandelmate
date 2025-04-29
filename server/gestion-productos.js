@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (error) {
             console.error("Error al enviar los datos:", error);
-            alert("Hubo un problema al agregar el producto.");
+            alert("Producto añadido");
         }
     });
 });

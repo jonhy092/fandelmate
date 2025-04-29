@@ -1,6 +1,7 @@
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 //import { jsPDF } from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-const { jsPDF } = window.jspdf;
+//import { jsPDF } from './libs/jspdf.umdlibs';
+
 
 
 class PedidosManager {
