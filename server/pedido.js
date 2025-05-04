@@ -1,5 +1,6 @@
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-//import { jsPDF } from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+const { jsPDF } = window.jspdf;
+
 //import { jsPDF } from './libs/jspdf.umdlibs';
 
 
@@ -307,13 +308,101 @@ class PedidosManager {
     }
   }
 
-  generarPDF = (e) => {
+  generarPDF = async (e) => {
     const btn = e.target.closest('.btnDescargarPDF');
-    if (!btn) return; // ⛔ Salgo si no se encontró el botón
-    const idPedido = btn.dataset.id;
+    if (!btn) return;
   
-    // Tu código para generar el PDF sigue acá...
-  }
+    const idPedido = btn.dataset.id;
+    const pedido = this.pedidos.find(p => p.id === idPedido);
+  
+    if (!pedido) {
+      alert('Pedido no encontrado');
+      return;
+    }
+  
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+  
+    const marginLeft = 15;
+    let y = 20;
+  
+    // ENCABEAZADO//
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(40, 120, 80);
+    doc.text('Fan del Mate', marginLeft, y);
+    y += 10;
+  
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'normal');
+    const fecha = new Date().toLocaleDateString('es-AR');
+    doc.text(`Factura de compra - ${fecha}`, marginLeft, y);
+    y += 15;
+  
+    // DATOS DEL CLIENTE//
+    doc.text(`Pedido ID: ${pedido.id}`, marginLeft, y); y += 7;
+    doc.text(`Cliente: ${pedido.cliente_nombre}`, marginLeft, y); y += 7;
+    doc.text(`Email: ${pedido.cliente_email}`, marginLeft, y); y += 7;
+    if (pedido.direccion) {
+      doc.text(`Dirección: ${pedido.direccion}`, marginLeft, y); y += 7;
+    }
+    doc.text(`Envío: ${pedido.necesita_envio ? 'Sí' : 'No'}`, marginLeft, y); y += 7;
+    doc.text(`Forma de pago: ${pedido.forma_pago === 'cash-debit' ? 'Efectivo/Débito' : 'Tarjeta Crédito'}`, marginLeft, y); y += 10;
+  
+    // TABLA DE PRODUCTOS//
+    doc.setFont('helvetica', 'bold');
+    doc.text('Producto', marginLeft, y);
+    doc.text('Cantidad', marginLeft + 80, y);
+    doc.text('Precio', marginLeft + 130, y);
+    y += 5;
+    doc.line(marginLeft, y, marginLeft + 180, y); y += 5;
+  
+    doc.setFont('helvetica', 'normal');
+    pedido.productos.forEach(p => {
+      doc.text(p.nombre, marginLeft, y);
+      doc.text(`${p.cantidad}`, marginLeft + 80, y);
+      doc.text(`$${p.precio.toFixed(2)}`, marginLeft + 130, y);
+      y += 7;
+    });
+  
+    y += 5;
+    doc.line(marginLeft, y, marginLeft + 180, y); y += 10;
+  
+    // TOTAL//
+    const total = (parseFloat(pedido.total) || 0).toFixed(2);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text(`Total a pagar: $${total}`, marginLeft, y);
+    y += 15;
+  
+    // MSJ AGRADECIMIENTO//
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(100, 100, 100);
+    doc.text('¡Gracias por su compra! Que lo disfrutes con unos buenos mates ☕🍃', marginLeft, y);
+    y += 15;
+  
+    // GENERAR QR SEGUIMIENTO//
+    const qr = new QRious({
+      value: `https://fandelmate.com/pedido/${pedido.id}`,
+      size: 100
+    });
+  
+    // ESPERAR QUE CARGUE EL QR//
+    const imgData = qr.toDataURL('image/png');
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Escaneá para ver tu pedido:', marginLeft, y);
+    doc.addImage(imgData, 'PNG', marginLeft, y + 5, 30, 30); // QR en el PDF
+  
+    // GUARDO EL ARCHIVO//
+    doc.save(`pedido-${pedido.id.substring(0, 8)}.pdf`);
+  };
+  
+  
+  
   
   cambiarPagina(event) {
     event.preventDefault();
